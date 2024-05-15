@@ -939,15 +939,8 @@ class ThreadChannel(abc.Messageable, Hashable):
 
     def _sync_from_members_update(self, data: Dict[str, Any]) -> None:
         self.member_count = data.get('member_count', self.member_count)
-        joined = self._state.member_cache_flags.joined
+        # joined = self._state.member_cache_flags.joined
         for new_member in data.get('added_members', []):
-            if joined:
-                if not self.guild.get_member(int(new_member['user_id'])):
-                    # This should be only the case if the ``GUILD_MEMBER`` Intent is disabled.
-                    # But we use the data discord send us to add him to cache.
-                    # NOTE: This may be removed later
-                    from .member import Member
-                    self.guild._add_member(Member(data=new_member, guild=self.guild, state=self._state))
             self._add_member(ThreadMember(state=self._state, guild=self.guild, data=new_member))
         for removed_id in data.get('removed_member_ids', []):
             member = self.get_member(int(removed_id))
