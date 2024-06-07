@@ -138,9 +138,9 @@ class Entitlement:
         """Date at which the entitlement is no longer valid. `None` when using test entitlements."""
         self.consumed: Optional[bool] = bool(data.get("consumed"))
         """
-        For consumable items, whether or not the entitlement has been consumed.
-        
+        Indicates whether the entitlement has been consumed for consumable items.
         Can be `None` in certain cases.
+        """
         """
 
     @property
