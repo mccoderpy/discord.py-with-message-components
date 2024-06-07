@@ -136,7 +136,7 @@ class Entitlement:
         """Start date at which the entitlement is valid. `None` when using test entitlements."""
         self.ends_at: datetime = utils.parse_time(data.get('ends_at'))
         """Date at which the entitlement is no longer valid. `None` when using test entitlements."""
-        self.consumed: Optional[bool] = bool(data.get("consumed", None))
+        self.consumed: Optional[bool] = bool(data.get("consumed"))
         """
         For consumable items, whether or not the entitlement has been consumed.
         
