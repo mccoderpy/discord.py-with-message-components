@@ -39,7 +39,7 @@ from datetime import datetime
 from .types import monetization as m
 
 from . import utils
-from .enums import SKUType, try_enum
+from .enums import SKUType, EntitlementType, try_enum
 from .flags import SKUFlags
 
 if TYPE_CHECKING:
@@ -78,6 +78,14 @@ class SKU:
             This can be used to differentiate between a user and a server subscription.
     """
     __slots__ = ('id', 'type', 'application_id', 'name', 'slug', 'flags',)
+    
+    if TYPE_CHECKING:
+        id: int
+        type: SKUType
+        application_id: int
+        name: str
+        slug: str
+        flags: SKUFlags
 
     def __init__(self, data: m.SKU) -> None:
         self.id: int = int(data['id'])
@@ -90,12 +98,12 @@ class SKU:
 
 class Entitlement:
     """
-    Entitlements represent a user's claim to a premium offering for your application.
+    Entitlements represent that a user or guild has access to a premium offering in your application.
 
     .. versionadded:: 2.0
 
     Attributes
-    ----------
+    =========
     id: :class:`int`
         The ID of the entitlement
     sku_id: :class:`int`
@@ -105,6 +113,8 @@ class Entitlement:
     user_id: Optional[:class:`int`]
         :attr:`~discord.SKUFlags.app_user_subscription` only: The ID of the user that is granted access to the
         entitlement's sku
+    type: :class:`discord.EntitlementType`
+        The type of the entitlement
     guild_id: Optional[:class:`int`]
         :attr:`~discord.SKUFlags.app_guild_subscription` only: The ID of the guild that is granted access to the
         entitlement's sku
@@ -114,33 +124,28 @@ class Entitlement:
         Start date at which the entitlement is valid. ``None`` for test entitlements.
     ends_at: Optional[:class:`datetime.datetime`]
         Time at which the entitlement is no longer valid. ``None`` for test entitlements.
-
+    consumed: Optional[:class:`bool`]
+            Indicates whether the entitlement has been consumed for consumable items.
+            Can be ``None`` in certain cases.
     """
-    __slots__ = ('_state', 'id', 'sku_id', 'application_id', 'user_id', 'guild_id', 'deleted', 'starts_at', 'ends_at',)
+    __slots__ = ('_state', '_type', 'id', 'sku_id', 'application_id', 'user_id', 'guild_id', 'deleted', 'starts_at', 'ends_at', 'consumed',)
 
     def __init__(self, data: m.EntitlementData, state: ConnectionState) -> None:
         self._state: ConnectionState = state
         self.id: int = int(data['id'])
-        """ID of the entitlement"""
         self.sku_id: int = int(data['sku_id'])
-        """ID of the SKU"""
         self.application_id: int = int(data['application_id'])
-        """ID of the parent application"""
         self.user_id: Optional[int] = utils._get_as_snowflake(data, 'user_id')
-        """	ID of the user that is granted access to the entitlement's sku | can be `None`"""
         self.guild_id: Optional[int] = utils._get_as_snowflake(data, 'guild_id')
-        """ID of the guild that is granted access to the entitlement's SKU"""
         self.deleted: bool = data['deleted']
-        """If the entitlement was deleted | `True` if the user has cancelled their entitlement."""
         self.starts_at: datetime = utils.parse_time(data.get('starts_at'))
-        """Start date at which the entitlement is valid. `None` when using test entitlements."""
         self.ends_at: datetime = utils.parse_time(data.get('ends_at'))
-        """Date at which the entitlement is no longer valid. `None` when using test entitlements."""
-        self.consumed: Optional[bool] = bool(data.get("consumed"))
-        """
-        Indicates whether the entitlement has been consumed for consumable items.
-        Can be `None` in certain cases.
-        """
+        self.consumed: bool = bool(data.get("consumed", None))
+        self._type = data["type"]
+
+    @property
+    def type(self) -> EntitlementType:
+        return EntitlementType.try_value(self._type)
 
     @property
     def target(self):

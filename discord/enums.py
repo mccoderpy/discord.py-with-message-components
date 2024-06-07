@@ -1144,7 +1144,6 @@ class OnboardingPromptType(Enum):
     multiple_choice = 0
     dropdown        = 1
 
-
 class SKUType(Enum):
     durable_primary     = 1
     durable             = 2
@@ -1152,6 +1151,16 @@ class SKUType(Enum):
     bundle              = 4
     subscription        = 5
     subscription_group  = 6
+
+class EntitlementType(Enum):
+    purchase                    = 1 # Entitlement was purchased by user
+    premium_subscription        = 2 # Discord is Discord and this indicates Discord Nitro
+    developer_gift              = 3
+    test_mode_purchase          = 4 # Entitlement was purchased by a dev in application test mode
+    free_purchase               = 5
+    user_gift                   = 6
+    premium_purchase            = 7 # Entitlement was claimed by user for free as a Nitro Subscriber
+    application_subscription    = 8 # Entitlement was purchased as an app subscription
 
 
 def try_enum(cls: Type[Enum], val: Any):
