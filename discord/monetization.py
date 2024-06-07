@@ -121,13 +121,27 @@ class Entitlement:
     def __init__(self, data: m.EntitlementData, state: ConnectionState) -> None:
         self._state: ConnectionState = state
         self.id: int = int(data['id'])
+        """ID of the entitlement"""
         self.sku_id: int = int(data['sku_id'])
+        """ID of the SKU"""
         self.application_id: int = int(data['application_id'])
+        """ID of the parent application"""
         self.user_id: Optional[int] = utils._get_as_snowflake(data, 'user_id')
+        """	ID of the user that is granted access to the entitlement's sku | can be `None`"""
         self.guild_id: Optional[int] = utils._get_as_snowflake(data, 'guild_id')
+        """ID of the guild that is granted access to the entitlement's SKU"""
         self.deleted: bool = data['deleted']
+        """If the entitlement was deleted | `True` if the user has cancelled their entitlement."""
         self.starts_at: datetime = utils.parse_time(data.get('starts_at'))
+        """Start date at which the entitlement is valid. `None` when using test entitlements."""
         self.ends_at: datetime = utils.parse_time(data.get('ends_at'))
+        """Date at which the entitlement is no longer valid. `None` when using test entitlements."""
+        self.consumed: Optional[bool] = bool(data.get("consumed", None))
+        """
+        For consumable items, whether or not the entitlement has been consumed.
+        
+        Can be `None` in certain cases.
+        """
 
     @property
     def target(self):
