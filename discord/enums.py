@@ -84,7 +84,7 @@ __all__ = (
     'OnboardingMode',
     'OnboardingPromptType',
     'SKUType',
-    "EntitlementType",
+    'EntitlementType',
 )
 
 
