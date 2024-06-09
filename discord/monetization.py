@@ -112,9 +112,9 @@ class Entitlement:
         entitlement's sku
     deleted: :class:`bool`
         Whether this entitlement was deleted
-    starts_at: Optional[:class:`datetime.datetime`]
+    starts_at: Optional[:class:`~datetime.datetime`]
         Start date at which the entitlement is valid. ``None`` for test entitlements.
-    ends_at: Optional[:class:`datetime.datetime`]
+    ends_at: Optional[:class:`~datetime.datetime`]
         Time at which the entitlement is no longer valid. ``None`` for test entitlements.
     consumed: Optional[:class:`bool`]
             :attr:`~discord.SKUType.consumable` entitlements only: Indicates whether the entitlement has been consumed
