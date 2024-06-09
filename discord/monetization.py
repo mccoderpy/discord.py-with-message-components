@@ -105,8 +105,6 @@ class Entitlement:
     user_id: Optional[:class:`int`]
         :attr:`~discord.SKUFlags.app_user_subscription` only: The ID of the user that is granted access to the
         entitlement's sku
-    type: :class:`discord.EntitlementType`
-        The type of the entitlement
     guild_id: Optional[:class:`int`]
         :attr:`~discord.SKUFlags.app_guild_subscription` only: The ID of the guild that is granted access to the
         entitlement's sku
