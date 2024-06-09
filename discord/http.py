@@ -1897,6 +1897,15 @@ class HTTPClient:
         )
         return self.request(r)
 
+    def consume_entitlement(self, application_id: int, entitlement_id: int) -> Response[None]:
+        r = Route(
+            'POST',
+            '/applications/{application_id}/entitlements/{entitlement_id}/consume',
+            application_id=application_id,
+            entitlement_id=entitlement_id
+        )
+        return self.request(r)
+
     async def get_gateway(self, *, encoding='json', v=10, zlib=True):
         try:
             data = await self.request(Route('GET', '/gateway'))

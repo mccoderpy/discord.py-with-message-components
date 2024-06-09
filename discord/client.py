@@ -3105,3 +3105,16 @@ class Client:
             after=after,
             exclude_ended=exclude_ended
         )
+
+    async def consume_entitlement(self, entitlement_id: int) -> None:
+        """|coro|
+
+        For One-Time Purchase consumable SKUs, marks a given entitlement for the user as consumed.
+        :attr:`~discord.Entitlement.consumed` will be ``False`` for this entitlement when using :meth:`.fetch_entitlements`
+
+        Parameters
+        ----------
+        entitlement_id: :class:`int`
+            The ID of the entitlement to consume.
+        """
+        await self.http.consume_entitlement(self.app.id, entitlement_id)
