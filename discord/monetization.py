@@ -118,7 +118,6 @@ class Entitlement:
         Time at which the entitlement is no longer valid. ``None`` for test entitlements.
     consumed: Optional[:class:`bool`]
             Indicates whether the entitlement has been consumed for consumable items.
-            Can be ``None`` in certain cases.
     """
     __slots__ = ('_state', '_type', 'id', 'sku_id', 'application_id', 'user_id', 'guild_id', 'deleted', 'starts_at', 'ends_at', 'consumed',)
 
