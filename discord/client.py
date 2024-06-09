@@ -2985,7 +2985,7 @@ class Client:
             sku_id: int,
             target: Union[User, Guild, Snowflake],
             owner_type: Optional[Literal['guild', 'user']] = MISSING
-    ):
+    ) -> Entitlement:
         """|coro|
 
         .. note::
@@ -3037,7 +3037,7 @@ class Client:
         )
         return Entitlement(data=data, state=self._connection)
 
-    async def delete_test_entitlement(self, entitlement_id: int):
+    async def delete_test_entitlement(self, entitlement_id: int) -> None:
         """|coro|
 
         .. note::
@@ -3067,7 +3067,7 @@ class Client:
             before: Optional[Union[datetime.datetime, Snowflake]] = None,
             after: Optional[Union[datetime.datetime, Snowflake]] = None,
             exclude_ended: bool = False
-    ):
+    ) -> EntitlementIterator:
         """|coro|
 
         Parameters
@@ -3105,3 +3105,18 @@ class Client:
             after=after,
             exclude_ended=exclude_ended
         )
+
+    async def consume_entitlement(self, entitlement_id: int) -> None:
+        """|coro|
+
+        For one-time purchase :attr:`~discord.SKUType.consumable` SKUs,
+        marks a given entitlement for the user as consumed.
+        :attr:`~discord.Entitlement.consumed` will be ``False`` for this entitlement
+        when using :meth:`.fetch_entitlements`.
+
+        Parameters
+        ----------
+        entitlement_id: :class:`int`
+            The ID of the entitlement to consume.
+        """
+        await self.http.consume_entitlement(self.app.id, entitlement_id)

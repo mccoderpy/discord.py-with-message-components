@@ -1,6 +1,6 @@
 #  The MIT License (MIT)
 #
-#  Copyright (c) 2015-2021 Rapptz & (c) 2021-present mccoderpy
+#  Copyright (c) 2021-present mccoderpy
 #
 #  Permission is hereby granted, free of charge, to any person obtaining a
 #  copy of this software and associated documentation files (the "Software"),
@@ -33,16 +33,18 @@
 #
 from __future__ import annotations
 
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING
 from datetime import datetime
 
 from .types import monetization as m
 
 from . import utils
-from .enums import SKUType, try_enum
+from .enums import SKUType, EntitlementType, try_enum
 from .flags import SKUFlags
 
 if TYPE_CHECKING:
+    from .user import User
+    from .guild import Guild
     from .state import ConnectionState
 
 __all__ = (
@@ -90,7 +92,7 @@ class SKU:
 
 class Entitlement:
     """
-    Entitlements represent a user's claim to a premium offering for your application.
+    Entitlements represent that a user or guild has access to a premium offering in your application.
 
     .. versionadded:: 2.0
 
@@ -110,13 +112,22 @@ class Entitlement:
         entitlement's sku
     deleted: :class:`bool`
         Whether this entitlement was deleted
-    starts_at: Optional[:class:`datetime.datetime`]
+    starts_at: Optional[:class:`~datetime.datetime`]
         Start date at which the entitlement is valid. ``None`` for test entitlements.
-    ends_at: Optional[:class:`datetime.datetime`]
+    ends_at: Optional[:class:`~datetime.datetime`]
         Time at which the entitlement is no longer valid. ``None`` for test entitlements.
+    consumed: Optional[:class:`bool`]
+            :attr:`~discord.SKUType.consumable` entitlements only: Indicates whether the entitlement has been consumed
 
+            .. seealso:: To consume an entitlement you can use either of those
+
+                - :meth:`~discord.Entitlement.consume` from the Entitlement object directly
+                - :meth:`discord.Client.consume_entitlement` by using only the ID
     """
-    __slots__ = ('_state', 'id', 'sku_id', 'application_id', 'user_id', 'guild_id', 'deleted', 'starts_at', 'ends_at',)
+    __slots__ = (
+        '_state', '_type', 'id', 'sku_id', 'application_id', 'user_id', 'guild_id', 'deleted', 'starts_at', 'ends_at',
+        'consumed',
+    )
 
     def __init__(self, data: m.EntitlementData, state: ConnectionState) -> None:
         self._state: ConnectionState = state
@@ -128,9 +139,16 @@ class Entitlement:
         self.deleted: bool = data['deleted']
         self.starts_at: datetime = utils.parse_time(data.get('starts_at'))
         self.ends_at: datetime = utils.parse_time(data.get('ends_at'))
+        self.consumed: Optional[bool] = data.get('consumed')
+        self._type: int = data['type']
 
     @property
-    def target(self):
+    def type(self) -> EntitlementType:
+        """:class:`~discord.EntitlementType`: The type of the entitlement"""
+        return try_enum(EntitlementType, self._type)
+
+    @property
+    def target(self) -> Union[User, Guild]:
         """
         Returns the target of the entitlement.
 
@@ -142,6 +160,18 @@ class Entitlement:
             return self._state.get_user(self.user_id)
         elif self.guild_id is not None:
             return self._state._get_guild(self.guild_id)
+
+    async def consume(self) -> None:
+        """|coro|
+
+        For one-time purchase :attr:`~discord.SKUType.consumable` SKUs,
+        marks a given entitlement for the user as consumed.
+        :attr:`.consumed` will be ``False`` for this entitlement when using :meth:`~discord.Client.fetch_entitlements`.
+
+        .. note::
+            This can can also be done with just the ID using :meth:`~discord.Client.consume_entitlement`
+        """
+        await self._state.http.consume_entitlement(self.application_id, self.id)
 
     # TODO: Add additional attributes used for gift entitlements
     # TODO: Finish documentation
