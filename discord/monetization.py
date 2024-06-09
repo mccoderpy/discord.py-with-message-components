@@ -117,7 +117,7 @@ class Entitlement:
     ends_at: Optional[:class:`datetime.datetime`]
         Time at which the entitlement is no longer valid. ``None`` for test entitlements.
     consumed: Optional[:class:`bool`]
-            For consumable entitlements only: Indicates whether the entitlement has been consumed.
+            :attr:`~discord.SKUType.consumable` entitlements only: Indicates whether the entitlement has been consumed
 
             .. seealso:: To consume an entitlement you can use either of those
                 :meth:`~discord.Entitlement.consume`
@@ -163,7 +163,8 @@ class Entitlement:
     async def consume(self) -> None:
         """|coro|
 
-        For One-Time Purchase consumable SKUs, marks a given entitlement for the user as consumed.
+        For one-time purchase :attr:`~discord.SKUType.consumable` SKUs,
+        marks a given entitlement for the user as consumed.
         :attr:`.consumed` will be ``False`` for this entitlement when using :meth:`~discord.Client.fetch_entitlements`.
 
         .. note::

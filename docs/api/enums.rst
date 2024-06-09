@@ -1640,6 +1640,9 @@ of :class:`enum.Enum`.
 
     Represents the type of a :class:`SKU`.
 
+    .. attribute:: application
+        An application SKU
+
     .. attribute:: durable
 
         Durable one-time purchase
@@ -1648,13 +1651,17 @@ of :class:`enum.Enum`.
 
         Consumable one-time purchase
 
+    .. attribute:: bundle
+
+        A bundle SKU
+
     .. attribute:: subscription
 
         Represents a recurring subscription
 
     .. attribute:: subscription_group
 
-        System-generated group for each SUBSCRIPTION SKU created
+        System-generated group for each :attr:`.subscription` SKU created
 
 
 .. class:: EntitlementType

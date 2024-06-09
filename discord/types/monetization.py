@@ -45,8 +45,8 @@ __all__ = (
     'Entitlement',
 )
 
-SKUType = Literal[5, 6]
-EntitlementType = Literal[8]
+SKUType = Literal[1, 2, 3, 4, 5, 6]
+EntitlementType = Literal[1, 2, 3, 4, 5, 6, 7, 8]
 
 
 class SKU(TypedDict):
@@ -65,6 +65,7 @@ class TestEntitlement(TypedDict):
     user_id: NotRequired[SnowflakeID]
     guild_id: NotRequired[SnowflakeID]
     type: EntitlementType
+    consumed: bool
     deleted: bool
 
 

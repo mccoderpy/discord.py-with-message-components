@@ -1147,7 +1147,7 @@ class OnboardingPromptType(Enum):
 
 
 class SKUType(Enum):
-    durable_primary     = 1
+    application     = 1
     durable             = 2
     consumable          = 3
     bundle              = 4
@@ -1158,7 +1158,7 @@ class SKUType(Enum):
 class EntitlementType(Enum):
     purchase                    = 1
     premium_subscription        = 2
-    developer_gift              = 3 # not a feature yet
+    developer_gift              = 3  # not a feature yet
     test_mode_purchase          = 4
     free_purchase               = 5
     user_gift                   = 6
