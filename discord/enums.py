@@ -1147,7 +1147,7 @@ class OnboardingPromptType(Enum):
 
 
 class SKUType(Enum):
-    application     = 1
+    application         = 1
     durable             = 2
     consumable          = 3
     bundle              = 4
