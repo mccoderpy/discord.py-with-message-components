@@ -120,8 +120,9 @@ class Entitlement:
             :attr:`~discord.SKUType.consumable` entitlements only: Indicates whether the entitlement has been consumed
 
             .. seealso:: To consume an entitlement you can use either of those
-                :meth:`~discord.Entitlement.consume`
-                :meth:`discord.Client.consume_entitlement`
+
+                - :meth:`~discord.Entitlement.consume` from the Entitlement object directly
+                - :meth:`discord.Client.consume_entitlement` by using only the ID
     """
     __slots__ = (
         '_state', '_type', 'id', 'sku_id', 'application_id', 'user_id', 'guild_id', 'deleted', 'starts_at', 'ends_at',
