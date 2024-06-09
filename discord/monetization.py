@@ -103,7 +103,7 @@ class Entitlement:
     .. versionadded:: 2.0
 
     Attributes
-    ---------
+    =========
     id: :class:`int`
         The ID of the entitlement
     sku_id: :class:`int`
@@ -141,12 +141,11 @@ class Entitlement:
         self.starts_at: datetime = utils.parse_time(data.get('starts_at'))
         self.ends_at: datetime = utils.parse_time(data.get('ends_at'))
         self.consumed: bool = bool(data.get("consumed", None))
-        self._type = data["type"]
+        self._type: int = data["type"]
 
     @property
     def type(self) -> EntitlementType:
-        """:class:`discord.EntitlementType`: The type of the entitlement"""
-        return EntitlementType.try_value(self._type)
+        return try_enum(EntitlementType, self._type)
 
     @property
     def target(self):

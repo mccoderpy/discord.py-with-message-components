@@ -84,6 +84,7 @@ __all__ = (
     'OnboardingMode',
     'OnboardingPromptType',
     'SKUType',
+    "EntitlementType",
 )
 
 
@@ -1144,6 +1145,7 @@ class OnboardingPromptType(Enum):
     multiple_choice = 0
     dropdown        = 1
 
+
 class SKUType(Enum):
     durable_primary     = 1
     durable             = 2
@@ -1151,6 +1153,7 @@ class SKUType(Enum):
     bundle              = 4
     subscription        = 5
     subscription_group  = 6
+
 
 class EntitlementType(Enum):
     purchase                    = 1 # Entitlement was purchased by user

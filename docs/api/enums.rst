@@ -1647,3 +1647,16 @@ of :class:`enum.Enum`.
     .. attribute:: subscription_group
 
         System-generated group for each SUBSCRIPTION SKU created
+
+
+.. class:: EntitlementType
+
+    Represents the type of a :class:`Entitlement`.
+
+    .. attribute:: subscription
+
+        Represents a recurring subscription
+
+    .. attribute:: subscription_group
+
+        System-generated group for each SUBSCRIPTION SKU created
