@@ -43,6 +43,8 @@ from .enums import SKUType, EntitlementType, try_enum
 from .flags import SKUFlags
 
 if TYPE_CHECKING:
+    from .user import User
+    from .guild import Guild
     from .state import ConnectionState
 
 __all__ = (
@@ -139,7 +141,7 @@ class Entitlement:
         return try_enum(EntitlementType, self._type)
 
     @property
-    def target(self):
+    def target(self) -> Union[User, Guild]:
         """
         Returns the target of the entitlement.
 
