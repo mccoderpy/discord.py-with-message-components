@@ -1640,6 +1640,14 @@ of :class:`enum.Enum`.
 
     Represents the type of a :class:`SKU`.
 
+    .. attribute:: durable
+
+        Durable one-time purchase
+
+    .. attribute:: consumable
+
+        Consumable one-time purchase
+
     .. attribute:: subscription
 
         Represents a recurring subscription
@@ -1653,10 +1661,34 @@ of :class:`enum.Enum`.
 
     Represents the type of a :class:`Entitlement`.
 
-    .. attribute:: subscription
+    .. attribute:: purchase
 
-        Represents a recurring subscription
+        Entitlement was purchased by user
 
-    .. attribute:: subscription_group
+    .. attribute:: premium_subscription
 
-        System-generated group for each SUBSCRIPTION SKU created
+        Entitlement for Discord Nitro subscription
+
+    .. attribute:: developer_gift
+
+        Entitlement was gifted by developer
+
+    .. attribute:: test_mode_purchase
+
+        Entitlement was purchased by a developer in application test mode
+
+    .. attribute:: free_purchase
+
+        Entitlement was granted when the SKU was free
+
+    .. attribute:: user_gift
+
+        Entitlement was gifted by another user
+
+    .. attribute:: premium_purchase
+
+        Entitlement was claimed by user for free as a Nitro Subscriber
+
+    .. attribute:: application_subscription
+
+        Entitlement was purchased as an app subscription

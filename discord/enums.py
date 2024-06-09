@@ -1156,14 +1156,14 @@ class SKUType(Enum):
 
 
 class EntitlementType(Enum):
-    purchase                    = 1 # Entitlement was purchased by user
-    premium_subscription        = 2 # Discord is Discord and this indicates Discord Nitro
-    developer_gift              = 3
-    test_mode_purchase          = 4 # Entitlement was purchased by a dev in application test mode
+    purchase                    = 1
+    premium_subscription        = 2
+    developer_gift              = 3 # not a feature yet
+    test_mode_purchase          = 4
     free_purchase               = 5
     user_gift                   = 6
-    premium_purchase            = 7 # Entitlement was claimed by user for free as a Nitro Subscriber
-    application_subscription    = 8 # Entitlement was purchased as an app subscription
+    premium_purchase            = 7
+    application_subscription    = 8
 
 
 def try_enum(cls: Type[Enum], val: Any):

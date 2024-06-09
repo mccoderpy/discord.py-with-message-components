@@ -103,7 +103,7 @@ class Entitlement:
     .. versionadded:: 2.0
 
     Attributes
-    =========
+    ---------
     id: :class:`int`
         The ID of the entitlement
     sku_id: :class:`int`
