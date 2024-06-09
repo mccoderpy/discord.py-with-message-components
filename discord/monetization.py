@@ -140,7 +140,7 @@ class Entitlement:
         self.deleted: bool = data['deleted']
         self.starts_at: datetime = utils.parse_time(data.get('starts_at'))
         self.ends_at: datetime = utils.parse_time(data.get('ends_at'))
-        self.consumed: Optional[bool] = data.get("consumed")
+        self.consumed: Optional[bool] = data.get('consumed')
         self._type: int = data["type"]
 
     @property
