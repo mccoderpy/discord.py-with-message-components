@@ -78,14 +78,6 @@ class SKU:
             This can be used to differentiate between a user and a server subscription.
     """
     __slots__ = ('id', 'type', 'application_id', 'name', 'slug', 'flags',)
-    
-    if TYPE_CHECKING:
-        id: int
-        type: SKUType
-        application_id: int
-        name: str
-        slug: str
-        flags: SKUFlags
 
     def __init__(self, data: m.SKU) -> None:
         self.id: int = int(data['id'])
