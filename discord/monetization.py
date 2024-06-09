@@ -145,6 +145,7 @@ class Entitlement:
 
     @property
     def type(self) -> EntitlementType:
+        """:class:`discord.EntitlementType`: The type of the entitlement"""
         return try_enum(EntitlementType, self._type)
 
     @property
