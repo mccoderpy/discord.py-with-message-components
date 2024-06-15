@@ -1098,7 +1098,8 @@ class StickerType(Enum):
 
 
 class AutoModEventType(Enum):
-    message_send = 1
+    message_send  = 1
+    member_update = 2
 
 
 class AutoModKeywordPresetType(Enum):
@@ -1112,12 +1113,14 @@ class AutoModTriggerType(Enum):
     spam            = 3
     keyword_preset  = 4
     mention_spam    = 5
+    member_profile  = 6
 
 
 class AutoModActionType(Enum):
-    block_message       = 1
-    send_alert_message  = 2
-    timeout_user        = 3
+    block_message            = 1
+    send_alert_message       = 2
+    timeout_user             = 3
+    block_member_interaction = 4
 
 
 class PostSortOrder(Enum):

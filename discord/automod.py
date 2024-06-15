@@ -26,7 +26,6 @@ DEALINGS IN THE SOFTWARE.
 
 from __future__ import annotations
 
-import re
 from typing import (
     Any,
     List,
@@ -81,7 +80,8 @@ class AutoModAction:
             This field is only present if :attr:`~AutoModAction.type` is :attr:`~AutoModActionType.send_alert_message`
         
     timeout_duration: Union[:class:`int`, :class:`~datetime.timedelta`]
-        Duration in seconds (:class:`int`) or a timerange (:class:`~datetime.timedelta`) for wich the target user should be timeouted.
+        Duration in seconds (:class:`int`) or a timerange (:class:`~datetime.timedelta`)
+        for which the target user should be timeouted.
 
         **The maximum value is** ``2419200`` **seconds (4 weeks)**
 
@@ -89,7 +89,8 @@ class AutoModAction:
            This field is only present if :attr:`~AutoModAction.type` is :attr:`~AutoModActionType.timeout_user`
     
     custom_message: Optional[:class:`str`]
-        Additional explanation that will be shown to target users whenever their message is blocked. **Max 150 characters**
+        Additional explanation that will be shown to target users whenever their message is blocked.
+        **Max 150 characters**
         
         .. note::
             This field might only be present if :attr:`~AutoModAction.type` is :attr:`~AutoModActionType.block_message`
@@ -106,10 +107,12 @@ class AutoModAction:
             The channel to which target user content should be logged.
     
             .. note::
-                This field is only required if :attr:`~AutoModAction.type` is :attr:`~AutoModActionType.send_alert_message`
+                This field is only required if :attr:`~AutoModAction.type` is
+                :attr:`~AutoModActionType.send_alert_message`
             
         timeout_duration: Union[:class:`int`, :class:`datetime.timedelta`]
-            Duration in seconds (:class:`int`) or a timerange (:class:`~datetime.timedelta`) for wich the user should be timeouted.
+            Duration in seconds (:class:`int`) or a timerange (:class:`~datetime.timedelta`)
+            for which the user should be timeouted.
     
             **The maximum value is** ``2419200`` **seconds (4 weeks)**
     
@@ -117,7 +120,8 @@ class AutoModAction:
                This field is only required if :attr:`~AutoModAction.type` is :attr:`~AutoModActionType.timeout_user`
         
         custom_message: Optional[:class:`str`]
-            Additional explanation that will be shown to target users whenever their message is blocked. **Max 150 characters**
+            Additional explanation that will be shown to target users whenever their message is blocked.
+            **Max 150 characters**
             
             .. note::
                 This field is only allowed if :attr:`~AutoModAction.type` is :attr:`~AutoModActionType.block_message`
@@ -128,7 +132,8 @@ class AutoModAction:
             If the type is :attr:`~AutoModActionType.send_alert_message` and no ``channel_id`` is provided,
             or if the type is :attr:`~AutoModActionType.timeout_user` and no ``timeout_duration`` is provided.
         ValueError
-            If the ``custom_message`` is longer than 150 characters, or if the ``timeout_duration`` is longer than 4 weeks.
+            If the ``custom_message`` is longer than 150 characters,
+            or if the ``timeout_duration`` is longer than 4 weeks.
         """
         self.type: AutoModActionType = try_enum(AutoModActionType, type)
         self.metadata = metadata  # maybe we need this later... idk
@@ -460,9 +465,9 @@ class AutoModRule:
     name: :class:`str`
         The name of the rule
     creator_id: :class:`int`
-        The id of the user wich created this rule
+        The id of the user which created this rule
     event_type: :class:`AutoModEventType`
-        The event wich will trigger this rule
+        The event which will trigger this rule
     trigger_type: :class:`AutoModEventType`
         The type of content which will trigger the rule
     trigger_metadata: :class:`AutoModTriggerMetadata`
@@ -696,11 +701,11 @@ class AutoModActionPayload:
     guild_id: :class:`int`
         The id of the guild in which action was executed
     action: :class:`AutoModAction`
-        The action wich was executed
+        The action which was executed
     rule_id: :class:`int`
         The id of the rule which action belongs to
     rule_trigger_type: :class:`~discord.AutoModTriggerType`
-        The trigger type of rule wich was triggered
+        The trigger type of rule which was triggered
     user_id: :class:`int`
         The id of the user which generated the content which triggered the rule
     channel_id: Optional[:class:`int`]
@@ -766,7 +771,7 @@ class AutoModActionPayload:
     @property
     def channel(self) -> Optional[GuildChannel]:
         """
-        The channel in wich user content was posted, if any.
+        The channel in which user content was posted, if any.
 
         Returns
         --------

@@ -1461,6 +1461,11 @@ of :class:`enum.Enum`.
 
         When a member sends or edits a message (in the guild the rule belongs to)
 
+    .. attribute:: member_update
+
+        When a member updates their profile
+
+
 .. class:: AutoModKeywordPresetType
 
     .. attribute:: profanity
@@ -1491,6 +1496,15 @@ of :class:`enum.Enum`.
 
         Check if content contains words from internal pre-defined wordsets
 
+    .. attribute:: mention_spam
+
+        Check if content contains more unique mentions than allowed
+
+    .. attribute:: member_profile
+
+        Check if a members' profile contains words from a user defined list of keywords
+
+
 .. class:: AutoModActionType
 
     The type of action that should be taken in an :class:`AutoModAction`.
@@ -1509,7 +1523,11 @@ of :class:`enum.Enum`.
 
         .. note::
 
-            This can only be used when the :attr:`~AutoModRule.trigger_type` is ``keyword``
+            This can only be used when the :attr:`~AutoModRule.trigger_type` is ``keyword`` or ``mention_spam``
+
+    .. attribute:: block_member_interaction
+
+        Prevents a member from using text, voice, or other interactions
 
 .. class:: TextInputStyle
 
