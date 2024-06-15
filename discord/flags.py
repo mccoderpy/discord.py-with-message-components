@@ -310,6 +310,15 @@ class ChannelFlags(BaseFlags):
 
     # TODO: add IS_BROADCASTING (1 << 14) flag when we get more info on it
 
+    @flag_value
+    def hide_media_download_options(self):
+        """:class:`bool`: Returns ``True`` embedding media download options is disabled.
+
+        .. note::
+            Available only for media channels.
+    """
+        return 1 << 15
+
 
 @fill_with_flags()
 class MessageFlags(BaseFlags):
@@ -600,11 +609,18 @@ class GuildMemberFlags(BaseFlags):
     
     @flag_value
     def bypasses_verification(self):
-        """:class:`bool`: Returns :obj:`True` if the member bypasses guild verification requirements
+        """:class:`bool`: Returns :obj:`True` if the member is exempt from guild verification requirements
         
         .. note::
-            This flag is editable and let you manually "verify" the member.
-            This requires :attr:`~discord.Permissions.moderate_members` permissions.
+            This flag is editable and allows a member who does not meet verification requirements to participate in a
+            server.
+
+            This requires either:
+
+             - :attr:`~discord.Permissions.manage_guild` OR
+             - :attr:`~discord.Permissions.manage_roles` OR
+             - :attr:`~discord.Permissions.moderate_members` AND :attr:`~discord.Permissions.kick_members` AND
+                :attr:`~discord.Permissions.ban_members` permissions.
         """
         return 1 << 2
     

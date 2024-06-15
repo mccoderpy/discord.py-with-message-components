@@ -57,9 +57,10 @@ __all__ = (
     'GroupChannel'
 )
 
-ChannelType = Literal[0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15]
+ChannelType = Literal[0, 1, 2, 3, 4, 5, 10, 11, 12, 13, 14, 15, 16]
 OverwriteType = Literal[0, 1]
 StagePrivacyLevel = Literal[1, 2]
+
 
 class Overwrite(TypedDict):
     id: SnowflakeID

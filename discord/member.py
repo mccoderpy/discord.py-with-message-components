@@ -955,23 +955,27 @@ class Member(abc.Messageable, _BaseUser):
 
         Depending on the parameter passed, this requires different permissions listed below:
 
-        +------------------------------+--------------------------------------+
-        |          Parameter           |              Permission              |
-        +------------------------------+--------------------------------------+
-        | nick                         | :attr:`Permissions.manage_nicknames` |
-        +------------------------------+--------------------------------------+
-        | mute                         | :attr:`Permissions.mute_members`     |
-        +------------------------------+--------------------------------------+
-        | deafen                       | :attr:`Permissions.deafen_members`   |
-        +------------------------------+--------------------------------------+
-        | roles                        | :attr:`Permissions.manage_roles`     |
-        +------------------------------+--------------------------------------+
-        | voice_channel                | :attr:`Permissions.move_members`     |
-        +------------------------------+--------------------------------------+
-        | flags                        | :attr:`Permissions.moderate_members` |
-        +------------------------------+--------------------------------------+
-        | communication_disabled_until | :attr:`Permissions.moderate_members` |
-        +------------------------------+--------------------------------------+
+        +------------------------------+--------------------------------------------+
+        |          Parameter           |              Permission                    |
+        +------------------------------+--------------------------------------------+
+        | nick                         | :attr:`Permissions.manage_nicknames`       |
+        +------------------------------+--------------------------------------------+
+        | mute                         | :attr:`Permissions.mute_members`           |
+        +------------------------------+--------------------------------------------+
+        | deafen                       | :attr:`Permissions.deafen_members`         |
+        +------------------------------+--------------------------------------------+
+        | roles                        | :attr:`Permissions.manage_roles`           |
+        +------------------------------+--------------------------------------------+
+        | voice_channel                | :attr:`Permissions.move_members`           |
+        +------------------------------+--------------------------------------------+
+        | flags                        | - :attr:`Permissions.manage_guild` OR      |
+        |                              | - :attr:`Permissions.manage_roles` OR      |
+        |                              | - :attr:`Permissions.moderate_members` AND |
+        |                              |   :attr:`Permissions.kick_members` AND     |
+        |                              |   :attr:`Permissions.ban_members`          |
+        +------------------------------+--------------------------------------------+
+        | communication_disabled_until | :attr:`Permissions.moderate_members`       |
+        +------------------------------+--------------------------------------------+
 
         All parameters are optional.
 
@@ -998,7 +1002,8 @@ class Member(abc.Messageable, _BaseUser):
             Pass ``None`` to kick them from voice.
         flags: Optional[:class:`GuildMemberFlags`]
             The new flags for this member.
-            Note that you are currently only able to update the :attr:`GuildMemberFlags.bypasses_verification` flag.
+            Note that you are currently only able to update the
+            :attr:`~discord.GuildMemberFlags.bypasses_verification` flag.
         communication_disabled_until: Optional[:class:`datetime.datetime`]
             Temporarily puts the member in timeout until this time.
             If :obj:`None`, then the member  is removed from timeout.
