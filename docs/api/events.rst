@@ -198,7 +198,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
     By default, this prints to :data:`sys.stderr` however it could be
     overridden to have a different implementation.
 
-    :param command: The :class:`SlashCommand`/:class:`SubCommand`, :class:`MessageCommand` or :class:`UserCommand` in wich invocation the exception was raised.
+    :param command: The :class:`SlashCommand`/:class:`SubCommand`, :class:`MessageCommand` or :class:`UserCommand` in which invocation the exception was raised.
     :type command: :class:`ApplicationCommand`
     :param interaction: The interaction that was invoked
     :type interaction: :class:`ApplicationCommandInteraction`
@@ -875,7 +875,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
 .. function:: on_button_click(interaction, button)
 
-    Called when a :class:`Button`, that is attached to a :class:`Message` **wich is in the internal cache**, is pressed.
+    Called when a :class:`Button`, that is attached to a :class:`Message` **which is in the internal cache**, is pressed.
 
     .. note::
         In general it is more efficient to use :func:`~Client.on_click`/:func:`ext.commands.Cog.on_click` instead of this and :func:`on_raw_button_click` to make a callback for buttons
@@ -899,14 +899,14 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
 .. function:: on_selection_select(interaction, select_menu)
 
-    Called when a :class:`SelectMenu`, that is attached to a :class:`Message` **wich is in the internal cache**, is used.
+    Called when a :class:`SelectMenu`, that is attached to a :class:`Message` **which is in the internal cache**, is used.
 
     .. note::
         In general it is more efficient to use :func:`~Client.on_select`/:func:`ext.commands.Cog.on_select` instead of this and :func:`on_raw_selection_select` to make a callback for select menus
 
     :param interaction: The Interaction-object with all his attributes and methods to respond to the interaction
     :type interaction: :class:`~discord.ComponentInteraction`
-    :param select_menu: The :class:`SelectMenu` but with the :attr:`SelectMenu.values` set wich contains a list of the selected :attr:`~SelectMenu.options`. (this is also available under :attr:`discord.ComponentInteraction.component`).
+    :param select_menu: The :class:`SelectMenu` but with the :attr:`SelectMenu.values` set which contains a list of the selected :attr:`~SelectMenu.options`. (this is also available under :attr:`discord.ComponentInteraction.component`).
     :type select_menu: :class:`SelectMenu`
 
 .. function:: on_raw_selection_select(interaction, select_menu)
@@ -918,7 +918,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
     :param interaction: The Interaction-object with all his attributes and methods to respond to the interaction
     :type interaction: :class:`~discord.ComponentInteraction`
-    :param select_menu: The :class:`SelectMenu` but with the :attr:`SelectMenu.values` set wich contains a list of the selected :attr:`~SelectMenu.options`. (this is also available under :attr:`discord.ComponentInteraction.component`).
+    :param select_menu: The :class:`SelectMenu` but with the :attr:`SelectMenu.values` set which contains a list of the selected :attr:`~SelectMenu.options`. (this is also available under :attr:`discord.ComponentInteraction.component`).
     :type select_menu: :class:`SelectMenu`
 
 .. function:: on_modal_submit(interaction)
@@ -992,7 +992,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
         Called when a user uses a voice effect in a :class:`VoiceChannel`.
 
-        :param channel: The voice channel in wich the effect was used.
+        :param channel: The voice channel in which the effect was used.
         :type channel: :class:`VoiceChannel`
         :param payload: The payload containing info about the effect.
         :type payload: :class:`VoiceChannelEffectSendEvent`

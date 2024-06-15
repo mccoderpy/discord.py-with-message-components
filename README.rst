@@ -120,7 +120,7 @@ Application Command Examples
 |   Otherwise these commands will not be registered to discord and so not usable.                   |
 +---------------------------------------------------------------------------------------------------+
 
-A Slash-Command(Chat-Input) wich with that you can see the welcome screen of your guild and add new channels to it.
+A Slash-Command(Chat-Input) which with that you can see the welcome screen of your guild and add new channels to it.
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
@@ -163,7 +163,7 @@ A Slash-Command(Chat-Input) wich with that you can see the welcome screen of you
             CommandOption(
                 option_type=discord.OptionType.channel,
                 name='channel',
-                description='The channel wich the the welcome screen field goes to.',
+                description='The channel which the the welcome screen field goes to.',
                 channel_types=[discord.TextChannel]),
             CommandOption(
                 option_type=str,
@@ -173,7 +173,7 @@ A Slash-Command(Chat-Input) wich with that you can see the welcome screen of you
             CommandOption(
                 option_type=str,
                 name='emoji',
-                description='The emoji wich shows in front of the channel.',
+                description='The emoji which shows in front of the channel.',
                 required=False
             )
         ],
@@ -234,7 +234,7 @@ A Message Command that translate the corresponding Message in to the invokers lo
            sleep_seconds=4
        )
        if len(translated) > 2000:
-           # Message was send by a Nitro user wich can send messages with up to 4000 characters.
+           # Message was send by a Nitro user which can send messages with up to 4000 characters.
            # As we can't do this sent it as a file instead.
            new_file = io.BytesIO()
            file = new_file.write(translated)
@@ -242,7 +242,7 @@ A Message Command that translate the corresponding Message in to the invokers lo
 
     client.run('Your Bot-Token here')
 
-A User context-menu command wich shows you information about the corresponding user
+A User context-menu command which shows you information about the corresponding user
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 .. code-block:: python
 

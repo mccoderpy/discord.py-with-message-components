@@ -1374,7 +1374,7 @@ class AutocompleteInteraction(BaseInteraction):
 
     @property
     def command(self) -> Optional[Union[SlashCommand, MessageCommand, UserCommand]]:
-        """Optional[:class:`~discord.SlashCommand`]: The slash-command for wich autocomplete was triggered."""
+        """Optional[:class:`~discord.SlashCommand`]: The slash-command for which autocomplete was triggered."""
         if getattr(self, '_command', None) is not None:
             return self._command
         return self._state._get_client()._get_application_command(self.data.id) \
@@ -1473,7 +1473,7 @@ class ModalSubmitInteraction(BaseInteraction):
 
     def get_field(self, custom_id: Union[str, re.Pattern]) -> Optional[Union[TextInput, Tuple[TextInput, Match]]]:
         """
-        Gets the field wich :attr:`~discord.TextInput.custom_id` match, if any.
+        Gets the field which :attr:`~discord.TextInput.custom_id` match, if any.
 
         Parameters
         ----------
@@ -1489,7 +1489,7 @@ class ModalSubmitInteraction(BaseInteraction):
         Optional[Union[:class:`~discord.TextInput`, Tuple[:class:`~discord.TextInput`, |match_object|]]]:
             - If ``custom_id`` is a :class:`str`, the found :class:`TextInput` is returned, if any.
             - if ``custom_id`` is a |pattern_object| a :class:`tuple` is returned containing the field
-                wich :attr:`~discord.TextInput.custom_id` matches and the corresponding |match_object|, if any.
+                which :attr:`~discord.TextInput.custom_id` matches and the corresponding |match_object|, if any.
         """
         if isinstance(custom_id, re.Pattern):
             def _check(_c: TextInput):

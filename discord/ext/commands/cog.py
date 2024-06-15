@@ -371,7 +371,7 @@ class Cog(metaclass=CogMeta):
             custom_id: Optional[Union[Pattern[AnyStr], AnyStr]] = None
     ) -> Callable[[_ButtonCallback], _ButtonCallback]:
         """
-        A decorator with wich you can assign a function to a specific :class:`~discord.Button` (or its custom_id).
+        A decorator with which you can assign a function to a specific :class:`~discord.Button` (or its custom_id).
 
         .. important::
             The function this is attached to must take the same parameters as a
@@ -501,7 +501,7 @@ class Cog(metaclass=CogMeta):
             custom_id: Optional[Union[Pattern[AnyStr], AnyStr]] = None
     ) -> Callable[[_ModalCallback], _ModalCallback]:
         """
-        A decorator with wich you can assign a function to a specific :class:`~discord.Modal` (or its custom_id).
+        A decorator with which you can assign a function to a specific :class:`~discord.Modal` (or its custom_id).
 
         .. important::
             The function this is attached to must take the same parameters as a

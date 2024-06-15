@@ -37,7 +37,7 @@ class ClearCommand(commands.Cog):
             Option(
                 option_type=str,
                 name='members',
-                description='Separated by a , the member wich last x messages should be deleted. Separated by a ,',
+                description='Separated by a , the member which last x messages should be deleted. Separated by a ,',
                 description_localizations=Localizations(
                     german='Per , getrennt, die Member deren letzten x Nachrichten gelöscht werden sollen.'),
                 required=False,

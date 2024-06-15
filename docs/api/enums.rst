@@ -326,7 +326,7 @@ of :class:`enum.Enum`.
 
         A ping interaction, those are only used for
         `http-only interactions <https://discord.com/developers/docs/interactions/receiving-and-responding#receiving-an-interaction>`_
-        wich are currently not supported by discord4py.
+        which are currently not supported by discord4py.
 
     .. attribute:: ApplicationCommand
 

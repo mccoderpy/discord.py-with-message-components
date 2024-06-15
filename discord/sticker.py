@@ -250,7 +250,7 @@ class GuildSticker(Sticker):
     tags: List[:class:`str`]
         A list of tags for the sticker.
     guild_id: :class:`int`
-        The id of the guild wich this sticker belongs to.
+        The id of the guild which this sticker belongs to.
     available: :class:`bool`
         Whether this guild sticker can be used, may be :obj:`False` due to loss of Server Boosts
     user: :class:`User`

@@ -1256,7 +1256,7 @@ class ChannelSelect(BaseSelect):
     Very similar to :class:`SelectMenu` but you can select from a list of channels.
 
     For this type there is an additional parameter ``channel_types``
-    wich can be a list of :class:`ChannelType` (or the type itself like :class:`TextChannel` or :class:`StageChannel`)
+    which can be a list of :class:`ChannelType` (or the type itself like :class:`TextChannel` or :class:`StageChannel`)
     that specify
     from what channel types the user could choose.
 

@@ -916,7 +916,7 @@ class BotBase(GroupMixin):
         Parameters
         ----------
         cog: :class:`.Cog`
-            The cog wich application-commands should be added to the internal list of application-commands.
+            The cog which application-commands should be added to the internal list of application-commands.
         """
 
         self.remove_application_cmds_from_cog(cog)  # to ensure that commands that aren't in the cog anymore get removed
@@ -1058,7 +1058,7 @@ class BotBase(GroupMixin):
         Parameters
         ----------
         cog: :class:`.Cog`
-            The cog wich application-commands should be removed from the internal list of application-commands.
+            The cog which application-commands should be removed from the internal list of application-commands.
         """
         to_remove = []
         for t in self._application_commands_by_type.values():

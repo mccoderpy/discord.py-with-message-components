@@ -252,16 +252,16 @@ class Localizations:
             try:
                 return self[target.preferred_locale.value]
             except KeyError as exc:
-                if exc.args and exc.args[0].startswith('U'
-                                                       ):  # just the first letter because it's enough to identify wich one it is
+                # just the first letter because it's enough to identify which one it is
+                if exc.args and exc.args[0].startswith('U'):
                     pass
                 return_default = True
         elif hasattr(target, 'author_locale'):
             try:
                 return self[target.author_locale.value]
             except KeyError as exc:
-                if exc.args and exc.args[0].startswith('U'
-                                                       ):  # just the first letter because it's enough to identify wich one it is
+                # just the first letter because it's enough to identify which one it is
+                if exc.args and exc.args[0].startswith('U'):
                     pass
                 return_default = True
         else:

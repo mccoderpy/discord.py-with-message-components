@@ -1483,7 +1483,7 @@ class Client:
             custom_id: Optional[Union[Pattern[AnyStr], AnyStr]] = None
     ) -> Callable[[_ClickCallback], _ClickCallback]:
         """
-         A decorator with wich you can assign a function to a specific :class:`~discord.Button` (or its custom_id).
+         A decorator with which you can assign a function to a specific :class:`~discord.Button` (or its custom_id).
 
         .. important::
             The function this is attached to must take the same parameters as a
@@ -1632,7 +1632,7 @@ class Client:
             custom_id: Optional[Union[Pattern[AnyStr], AnyStr]] = None
     ) -> Callable[[_SubmitCallback], _SubmitCallback]:
         """
-         A decorator with wich you can assign a function to a specific :class:`~discord.Modal` (or its custom_id).
+         A decorator with which you can assign a function to a specific :class:`~discord.Modal` (or its custom_id).
 
         .. important::
             The function this is attached to must take the same parameters as a
