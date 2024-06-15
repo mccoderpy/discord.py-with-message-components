@@ -1,4 +1,5 @@
 sphinx
+sphinx-autobuild
 sphinxcontrib-contentui==0.2.5
 sphinxcontrib-websupport
 sphinxcontrib-trio

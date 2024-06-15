@@ -28,9 +28,9 @@ if errorlevel 9009 (
 
 if "%1" == "--show" (
     if "%2" == "" (
-       sphinx-autobuild --port=0 --watch=SOURCEDIR --open-browser --delay=2 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
+       sphinx-autobuild --port=0 --watch=%SOURCEDIR% --open-browser --delay=2 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O%
     ) else (
-       sphinx-autobuild --port=0 --watch=SOURCEDIR --open-browser --delay=2 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O% -b %2
+       sphinx-autobuild --port=0 --watch=%SOURCEDIR% --open-browser --delay=2 %SOURCEDIR% %BUILDDIR% %SPHINXOPTS% %O% -b %2
     )
     goto end
 )
