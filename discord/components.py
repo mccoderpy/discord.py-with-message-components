@@ -157,7 +157,7 @@ class BaseComponent:
 
 class Button(BaseComponent):
     """Represents a `Discord-Button <https://discord.com/developers/docs/interactions/message-components#button-object>`_"""
-    __slots__ = ('_label', '_custom_id', '_style', '_url', '_disabled')
+    __slots__ = ('_label', '_custom_id', '_style', '_url', '_disabled', '_sku_id')
 
     def __init__(
             self,
@@ -166,6 +166,7 @@ class Button(BaseComponent):
             style: Union[ButtonStyle, int] = ButtonStyle.grey,
             emoji: Union[PartialEmoji, Emoji, str] = None,
             url: Optional[str] = None,
+            sku_id: Optional[int] = None,
             disabled: bool = False
     ) -> None:
         """
@@ -183,22 +184,36 @@ class Button(BaseComponent):
             An emoji that will be displayed on the left side of the button.
         url: Optional[:class:`str`]
             An URL for the button if it is of type :attr:`ButtonStyle.url`
+        sku_id: Optional[:class:`int`]
+            The purchasable SKU's identifier when using :attr:`~discord.ButtonStyle.Premium`. Note that a premium
+            button can **only** have this attribute as well as :attr:`Button.disabled` set and can **not** have a
+            custom_id, label, url or emoji.
         """
         super().__init__(custom_id=custom_id, disabled=disabled)
         self.style: ButtonStyle = try_enum(ButtonStyle, style)
-        if not emoji and not label:
-            raise InvalidArgument('A button must have at least one of label or emoji set')
+        if self.style.Premium and not sku_id:
+            raise InvalidArgument("An sku_id must be specified for premium buttons")
+        elif sku_id and not self.style.Premium:
+            raise InvalidArgument("sku_id can only be used with discord.ButtonStyle.premium")
+        elif sku_id and any((label, custom_id, emoji, url,)):
+            raise InvalidArgument('A premium button can only have parameters sku_id and (optionally) disabled')
+
+        if not emoji and not label and not self.style.Premium:
+            raise InvalidArgument('Non-premium buttons must have at least one of label or emoji set')
         elif self.style.url and not url:
             raise InvalidArgument('An url is required for url buttons')
         elif url and not self.style.url:
             self.style = ButtonStyle.url
+
         if url and custom_id:
             raise URLAndCustomIDNotAlowed(self.custom_id)
-        elif not url and custom_id is None:
-            raise InvalidArgument('A custom_id must be specified for non-url buttons')
+        elif not url and custom_id is None and not sku_id:
+            raise InvalidArgument('A custom_id must be specified for non-url and non-premium buttons')
+
         self.url: Optional[str] = url
         self.label: str = label
         self.emoji = emoji
+        self.sku_id = sku_id
 
     def __repr__(self) -> str:
         return f'<Button {", ".join(["%s=%s" % (k, str(v)) for k, v in self.__dict__.items()])}>'
@@ -263,6 +278,14 @@ class Button(BaseComponent):
         if value and not value.startswith(('http://', 'https://', 'discord://')):
             raise ValueError(f'"{value}" is not a valid protocol. Only http(s) or discord protocol is supported')
         self._url = value
+
+    @property
+    def sku_id(self) -> Optional[int]:
+        return self._sku_id
+
+    @sku_id.setter
+    def sku_id(self, value: Optional[int]):
+        self._sku_id = value
 
     @utils.deprecated('label setter')
     def set_label(self, label: str):
@@ -399,6 +422,9 @@ class Button(BaseComponent):
             base['url'] = self.url
         if self.emoji:
             base['emoji'] = self.emoji.to_dict()
+        if self.sku_id:
+            base['sku_id'] = str(self.sku_id)
+            del base['label']
         return base
     
     @classmethod
