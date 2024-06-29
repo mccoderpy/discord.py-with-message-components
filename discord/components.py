@@ -442,7 +442,7 @@ class Button(BaseComponent):
             style=data['style'],
             url=data.get('url'),
             disabled=data.get('disabled', False),
-            sku_id=data.gat('sku_id'),
+            sku_id=data.get('sku_id'),
         )
 
 
