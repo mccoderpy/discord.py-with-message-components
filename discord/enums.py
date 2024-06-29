@@ -360,6 +360,7 @@ class ButtonStyle(Enum):
     grey_url    = 5
     gray_url    = 5
     Link_Button = 5
+    Premium     = 6
 
     @classmethod
     def from_value(cls, value):
