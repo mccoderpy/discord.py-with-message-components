@@ -185,7 +185,7 @@ class Button(BaseComponent):
         url: Optional[:class:`str`]
             An URL for the button if it is of type :attr:`ButtonStyle.url`
         sku_id: Optional[:class:`int`]
-            The purchasable SKU's identifier when using :attr:`~discord.ButtonStyle.Premium`. Note that a premium
+            The purchasable SKU's identifier when using :attr:`ButtonStyle.Premium`. Note that a premium
             button can **only** have this attribute as well as :attr:`Button.disabled` set and can **not** have a
             custom_id, label, url or emoji.
         """
@@ -281,6 +281,9 @@ class Button(BaseComponent):
 
     @property
     def sku_id(self) -> Optional[int]:
+        """
+        Optional[:class:`int`]: The purchasable SKU's identifier when :attr:`~Button.style` is set to :attr:`ButtonStyle.Premium`
+        """
         return self._sku_id
 
     @sku_id.setter
@@ -412,10 +415,11 @@ class Button(BaseComponent):
     def to_dict(self) -> ButtonPayload:
         base = {
             'type': 2,
-            'label': self.label,
             'style': int(self.style),
             'disabled': self.disabled
         }
+        if self.label:
+            base['label'] = self.label
         if self.custom_id is not None:
             base['custom_id'] = str(self.custom_id)
         elif self.url:
@@ -424,7 +428,6 @@ class Button(BaseComponent):
             base['emoji'] = self.emoji.to_dict()
         if self.sku_id:
             base['sku_id'] = str(self.sku_id)
-            del base['label']
         return base
     
     @classmethod
@@ -438,7 +441,8 @@ class Button(BaseComponent):
             custom_id=data.get('custom_id'),
             style=data['style'],
             url=data.get('url'),
-            disabled=data.get('disabled', False)
+            disabled=data.get('disabled', False),
+            sku_id=data.gat('sku_id'),
         )
 
 

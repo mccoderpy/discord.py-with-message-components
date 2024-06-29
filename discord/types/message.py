@@ -122,6 +122,7 @@ class Button(TypedDict):
     custom_id: NotRequired[str]
     url: NotRequired[str]
     disabled: NotRequired[bool]
+    sku_id: NotRequired[int]
 
 
 class DefaultValue(TypedDict):
