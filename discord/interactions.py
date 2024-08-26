@@ -523,26 +523,29 @@ class BaseInteraction:
         self.channel_id = channel_id = int(data.get('channel_id', channel_data.get('id', 0)))
 
         guild = self.guild or Object(id=guild_id) if guild_id else None  # I'm not sure if we need the Object thing here
-
+        channel, member = (None, None)
+        
         if guild:
-            channel = guild.get_channel(self.channel_id)
-            member = data.get('member')
+            member_data = data.get('member')
             self.author_permissions = Permissions(int(member.get('permissions', 0)))
-            user = member.get('user')
+            user_data = member_data.get('user')
             self.app_permissions = Permissions(int(data.get('app_permissions', 0)))
-            self.user_id = user_id = int(user['id'])
-            self.member = guild.get_member(user_id) or Member(state=state, data=member, guild=guild)
+            self.user_id = user_id = int(user_data['id'])
+            if isinstance(guild, Guild):
+                channel = guild.get_channel(self.channel_id)
+                member = guild.get_member(user_id)
+            self.member = member or Member(state=state, data=member_data, guild=guild)  # consider updating the member here
             self.guild_locale = try_enum(Locale, data.get('guild_locale'))
         else:
             channel = state._get_private_channel(channel_id)
-            user = data.get('user')
+            user_data = data.get('user')
             self.app_permissions = None
             self.author_permissions = None
             self.user_id = int(user['id'])
             self.member = None
             self.guild_locale = None
 
-        self.user = state.store_user(user)
+        self.user = state.store_user(user_data)
 
 
         if not channel:
