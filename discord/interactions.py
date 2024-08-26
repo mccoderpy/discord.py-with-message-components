@@ -527,7 +527,6 @@ class BaseInteraction:
         
         if guild:
             member_data = data.get('member')
-            self.author_permissions = Permissions(int(member.get('permissions', 0)))
             user_data = member_data.get('user')
             self.user_id = user_id = int(user_data['id'])
             if isinstance(guild, Guild):
