@@ -529,12 +529,12 @@ class BaseInteraction:
             member_data = data.get('member')
             self.author_permissions = Permissions(int(member.get('permissions', 0)))
             user_data = member_data.get('user')
-            self.app_permissions = Permissions(int(data.get('app_permissions', 0)))
             self.user_id = user_id = int(user_data['id'])
             if isinstance(guild, Guild):
                 channel = guild.get_channel(self.channel_id)
                 member = guild.get_member(user_id)
             self.member = member or Member(state=state, data=member_data, guild=guild)  # consider updating the member here
+            self.author_permissions = Permissions(int(member_data.get('permissions', 0)))
             self.guild_locale = try_enum(Locale, data.get('guild_locale'))
         else:
             channel = state._get_private_channel(channel_id)
