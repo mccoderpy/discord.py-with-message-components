@@ -540,10 +540,10 @@ class BaseInteraction:
             user_data = data.get('user')
             self.app_permissions = None
             self.author_permissions = None
-            self.user_id = int(user['id'])
             self.member = None
             self.guild_locale = None
-
+            self.user_id = int(user_data['id'])
+            
         self.user = state.store_user(user_data)
 
 
