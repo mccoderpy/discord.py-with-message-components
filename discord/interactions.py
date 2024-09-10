@@ -1581,7 +1581,8 @@ class InteractionData:
         if resolved:
             self.resolved = ResolvedData(state=state, data=resolved, guild=guild, channel_id=self._channel_id)
         options = self._data.get('options', [])
-        self.options = [InteractionDataOption(state=state, data=option, guild=guild) for option in options]
+        if options:
+            self.options = [InteractionDataOption(state=state, data=option, guild=guild) for option in options]
 
     def __getitem__(self, item):
         return getattr(self, item, NotImplemented)
@@ -1705,12 +1706,12 @@ class ResolvedData:
     def __init__(self, *, state: ConnectionState, data: ResolvedDataPayload, guild: Optional[Guild] = None, **kwargs) -> None:
         self._state: ConnectionState = state
         self._data = data
-        self._guild: Guild = guild
+        self._guild: Optional[Guild] = guild
         self._channel_id: Optional[int] = kwargs.pop('channel_id', None)
         for attr in ('users', 'members', 'channels', 'roles', 'messages', 'attachments'):
-            setattr(self, f'_{attr}', {})
             value = data.get(attr, None)
             if value is not None:
+                setattr(self, f'_{attr}', {})
                 getattr(self, f'_{self.__class__.__name__}__handle_{attr}')(value)
         del self._data  # No longer needed
 
@@ -1735,17 +1736,21 @@ class ResolvedData:
         return _members
 
     @property
-    def channels(self) -> Optional[Dict[int, abc.GuildChannel]]:
+    def channels(self) -> Optional[Dict[int, Union[abc.GuildChannel]]]:  # add DMChannel/GroupChannel
         return getattr(self, '_channels', {})
 
     def __handle_channels(self, value: dict):
         _channels = getattr(self, '_channels', {})
         for _id, c in value.items():
-            channel = self._guild.get_channel(int(_id))
+            _id = int(_id)
+            if self._guild:
+                channel = self._guild.get_channel(_id)
+            else:
+                channel = self._state.get_channel(_id)
             if not channel:
                 factory, _ch_type_ = _channel_factory(c['type'])
                 channel = factory(guild=self._guild, data=c, state=self._state)
-            _channels[int(_id)] = channel
+            _channels[_id] = channel
 
     @property
     def roles(self) -> Optional[Dict[int, Role]]:
