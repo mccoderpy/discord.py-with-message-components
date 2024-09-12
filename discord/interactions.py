@@ -1577,8 +1577,10 @@ class InteractionData:
         self._state: ConnectionState = state
         self._guild: Optional[Guild] = guild
         self._channel_id = kwargs.pop('channel_id', None)
-        resolved = data.get('resolved')
-        self.resolved: ResolvedData = ResolvedData(state=state, data=resolved, guild=guild, channel_id=self._channel_id)
+        if resolved := data.get('resolved'):
+            self.resolved: ResolvedData = ResolvedData(state=state, data=resolved, guild=guild, channel_id=self._channel_id)
+        else:
+            self.resolved = None  # just to be sure, but shouldn't be necessary unless discord misses to send them
         options = self._data.get('options', [])
         self.options: List[InteractionDataOption] = [
             InteractionDataOption(state=state, data=option, guild=guild) for option in options
