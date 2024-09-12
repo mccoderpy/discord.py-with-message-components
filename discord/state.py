@@ -1532,7 +1532,8 @@ class AutoShardedConnectionState(ConnectionState):
         for msg in self._messages:
             if not msg.guild:
                 removed.add(msg)
-
+                continue
+            
             new_guild = self._get_guild(msg.guild.id)
             if new_guild is not None and new_guild is not msg.guild:
                 channel_id = msg.channel.id

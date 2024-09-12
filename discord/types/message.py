@@ -67,7 +67,7 @@ __all__ = (
 
 
 ComponentType = Literal[1, 2, 3, 4, 5, 6, 7, 8]
-ButtonStyle = Literal[1, 2, 3, 4, 5]
+ButtonStyle = Literal[1, 2, 3, 4, 5, 6]
 TextInputStyle = Literal[1, 2]
 SelectDefaultValueType = Literal['user', 'role', 'channel']
 MessageType = Literal[
@@ -122,6 +122,7 @@ class Button(TypedDict):
     custom_id: NotRequired[str]
     url: NotRequired[str]
     disabled: NotRequired[bool]
+    sku_id: NotRequired[int]
 
 
 class DefaultValue(TypedDict):
