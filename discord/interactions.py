@@ -1578,11 +1578,11 @@ class InteractionData:
         self._guild: Optional[Guild] = guild
         self._channel_id = kwargs.pop('channel_id', None)
         resolved = data.get('resolved')
-        if resolved:
-            self.resolved = ResolvedData(state=state, data=resolved, guild=guild, channel_id=self._channel_id)
+        self.resolved: ResolvedData = ResolvedData(state=state, data=resolved, guild=guild, channel_id=self._channel_id)
         options = self._data.get('options', [])
-        if options:
-            self.options = [InteractionDataOption(state=state, data=option, guild=guild) for option in options]
+        self.options: List[InteractionDataOption] = [
+            InteractionDataOption(state=state, data=option, guild=guild) for option in options
+        ]
 
     def __getitem__(self, item):
         return getattr(self, item, NotImplemented)
