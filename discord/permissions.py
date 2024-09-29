@@ -661,7 +661,7 @@ class Permissions(BaseFlags):
     def start_voice_activities(self):
         """:class:`bool`: An alias for :attr:`start_embedded_activities`."""
         return 1 << 39
-    
+
     @flag_value
     def moderate_members(self):
         """:class:`bool`: Returns ``True`` if a user can moderate other members (like timeout or verify them).
@@ -708,6 +708,24 @@ class Permissions(BaseFlags):
 
         .. versionadded:: 2.0"""
         return 1 << 48
+
+    @flag_value
+    def send_polls(self):
+        """:class:`bool`: Returns ``True`` if a user can send polls in a channel.
+
+        .. versionadded:: 2.0"""
+        return 1 << 49
+
+    @flag_value
+    def use_external_apps(self):
+        """:class:`bool`: Returns ``True`` if user-installed apps are allowed to send public responses.
+
+        .. note::
+            - When ``False``, users will still be allowed to use their apps but the responses will be ephemeral.
+            - This only applies to apps not also installed to the server
+
+        .. versionadded:: 2.0"""
+        return 1 << 50
 
 
 def augment_from_permissions(cls):
