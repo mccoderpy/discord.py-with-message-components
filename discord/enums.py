@@ -345,7 +345,7 @@ class ButtonStyle(Enum):
     Represents the Style for a :class:`discord.Button`
 
     .. note ::
-        For more information about the Button-Styles, visit the `Discord-API Documentation <https://discord.com/developers/docs/interactions/message-components#buttons-button-styles>`_.
+        For more information about the Button-Styles, visit the :ddocs:`Discord-API Documentation <interactions/message-components#buttons-button-styles>`_.
 
     """
 
@@ -382,7 +382,7 @@ class ButtonColor(ButtonStyle):
     :class:`ButtonColor`
 
     .. note ::
-        This is just an Aliase to :class:`ButtonStyle`.
+        This is just an alias to :class:`ButtonStyle`.
     """
 
 
@@ -436,7 +436,8 @@ class InteractionCallbackType(Enum):
     update_msg               = 7
     autocomplete_callback    = 8
     modal                    = 9
-    premium_required         = 10
+    premium_required         = 10  # deprecated
+    launch_activity          = 12
 
 
     @classmethod

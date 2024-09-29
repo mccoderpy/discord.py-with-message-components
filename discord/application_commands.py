@@ -341,6 +341,10 @@ class ApplicationCommand:
         setattr(self, '_state_', value)
 
     @property
+    def type(self) -> ApplicationCommandType:
+        return try_enum(ApplicationCommandType, self._type)
+
+    @property
     def cog(self) -> Optional[Cog]:
         """Optional[:class:`~discord.ext.commands.Cog`]: The cog associated with this command if any."""
         return getattr(self, '_cog', None)
@@ -509,6 +513,8 @@ class ApplicationCommand:
             base['options'] = [o.to_dict() for o in self.options]
         if hasattr(self, 'sub_commands') and self.sub_commands:
             base['options'] = [sc.to_dict() for sc in self.sub_commands]
+        if hasattr(self, 'handler'):
+            base['handler'] = self.handler.value
         return base
 
     @property
@@ -523,11 +529,6 @@ class ApplicationCommand:
         """
         if self.id:
             return snowflake_time(self.id)
-
-    @property
-    def type(self) -> ApplicationCommandType:
-        """:class:`ApplicationCommandType`: The type of the command"""
-        return try_enum(ApplicationCommandType, self._type)
 
     @property
     def guild_id(self) -> Optional[int]:
@@ -551,12 +552,12 @@ class ApplicationCommand:
             return UserCommand.from_dict(state, data)
         elif command_type == 3:
             return MessageCommand.from_dict(state, data)
-        else:
-            return None
+        elif command_type == 4:
+            return ActivityEntryPointCommand.from_dict(state, data)
 
     @staticmethod
     def _sorted_by_type(commands):
-        sorted_dict = {'chat_input': [], 'user': [], 'message': []}
+        sorted_dict = {'chat_input': [], 'user': [], 'message': [], 'primary_entry_point': None}
         for cmd in commands:
             if cmd['type'] == 1:
                 predicate = 'chat_input'
@@ -564,6 +565,10 @@ class ApplicationCommand:
                 predicate = 'user'
             elif cmd['type'] == 3:
                 predicate = 'message'
+            elif cmd['type'] == 4:
+                predicate = 'primary_entry_point'
+                sorted_dict[predicate] = cmd
+                continue
             else:  # Should not be the case
                 continue
             sorted_dict[predicate].append(cmd)
@@ -581,6 +586,88 @@ class ApplicationCommand:
         await self._state.http.delete_application_command(self.application_id, self.id, guild_id)
         if guild_id:
             self._state._get_client()._remove_application_command(self, from_cache=True)
+
+
+class ActivityEntryPointCommand(ApplicationCommand):
+    """
+    The primary entry point command is required for users to be able to launch your Activity from the
+    :sup-art:`App Launcher menu <21334461140375-Using-Apps-on-Discord>` in Discord.
+
+    When you enable Activities in your app's settings, discord will automatically create a
+    :ddocs:`default Entry Point command </interactions/application-commands#default-entry-point-command>`
+
+    .. note::
+        By default discord will handle the command and launch the activity.
+        However, if you want to handle the command yourself to deside the response you can register a handler using
+        the :meth:`discord.Client.activity_primary_entry_point_command` decorator.
+
+    If you want to update the name, description, etc. you can do this by calling
+    :meth:`discord.Client.update_primary_entry_point_command`.
+
+    .. seealso::
+
+        - :meth:`discord.Client.activity_primary_entry_point_command`
+        - :meth:`discord.Client.get_primary_entry_point_command`
+        - :meth:`discord.Client.update_primary_entry_point_command`
+
+    Parameters
+    -----------
+    name: :class:`str`
+        The 1-32 characters long name of the command shows up in discord.
+    description: :class:`str`
+        The 1-100 characters long description of the command shows up in discord.
+    integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+        The integration type context this command is available for.
+        Defaults to the integration types set in the discord developer portal.
+    contexts: Optional[List[:class:`~discord.InteractionContextType`]]
+        The contexts this command is available for. Defaults to all contexts.
+    name_localizations: Optional[:class:`~Localizations`]
+        Localized names for the command.
+    description_localizations: Optional[:class:`~Localizations`]
+        Localized descriptions for the command.
+    handler: :class:`~discord.EntryPointHandlerType`
+
+    """
+    def __init__(
+            self,
+            name: str,
+            description: str,
+            *,
+            integration_types: Optional[List[InteractionContextType]] = None,
+            contexts: Optional[List[InteractionContextType]] = None,
+            name_localizations: Optional[Localizations] = None,
+            description_localizations: Optional[Localizations] = None,
+            handler: EntryPointHandlerType = EntryPointHandlerType(2),
+            **kwargs
+    ):
+        super().__init__(
+            type=4,
+            name=name,
+            description=description,
+            integration_types=integration_types,
+            contexts=contexts,
+            name_localizations=name_localizations,
+            description_localizations=description_localizations,
+            **kwargs
+        )
+        self.handler: EntryPointHandlerType = try_enum(EntryPointHandlerType, handler)
+
+    @classmethod
+    def from_dict(cls, state: ConnectionState, data: Dict[str, Any]) -> ActivityEntryPointCommand:
+        return cls(
+            name=data['name'],
+            description=data['description'],
+            integration_types=data.get('integration_types', None),
+            contexts=data.get('contexts', None),
+            name_localizations=Localizations.from_dict(data.get('name_localizations', {})),
+            description_localizations=Localizations.from_dict(data.get('description_localizations', {})),
+            handler=try_enum(EntryPointHandlerType, data.get('handler', 2)),
+            state=state
+        )._fill_data(data)
+
+    async def _parse_arguments(self, interaction: ApplicationCommandInteraction) -> Any:
+        interaction._command = self
+        return await self.invoke(interaction)
 
 
 class SlashCommandOptionChoice:
@@ -1505,7 +1592,7 @@ class SlashCommand(ApplicationCommand):
             else:
                 self._state.dispatch('application_command_error', self, interaction, exc)
 
-    async def _parse_arguments(self, interaction: ApplicationCommandInteraction):
+    async def _parse_arguments(self, interaction: ApplicationCommandInteraction) -> Any:
         to_invoke = self
         params = {}
         options = interaction.data.options

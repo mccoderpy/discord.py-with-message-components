@@ -740,6 +740,7 @@ class BaseInteraction:
                 msg = self.callback_message = await self.get_original_callback()
                 return msg
 
+    @utils.deprecated("Respond normal using ButtonType.premium instead")
     async def _premium_required(self) -> None:
         """|coro|
         Respond with an upgrade button, only available for apps
@@ -749,6 +750,17 @@ class BaseInteraction:
             self.id,
             self._token,
             data={'type': InteractionCallbackType.premium_required.value}
+        )
+
+    async def _respond_with_launch_activity(self) -> None:
+        """|coro|
+        Respond by launching the activity associated with the application.
+        Only available for apps with :ddocs:`Activities <activities/overview>` enabled.
+        """
+        await self._state.http.post_initial_response(
+            self.id,
+            self._token,
+            data={'type': InteractionCallbackType.launch_activity.value}
         )
 
     async def edit(
@@ -1311,6 +1323,9 @@ class ApplicationCommandInteraction(BaseInteraction):
 
     async def respond_with_premium_required(self) -> None:
         """|coro|
+        **Deprecated** Respond normal using :attr:`~discord.ButtonType.premium` instead.
+
+
         Respond with an upgrade button, only available for apps
         with :ddocs:`monetized apps <monetization/overview>` enabled.
 
@@ -1319,7 +1334,19 @@ class ApplicationCommandInteraction(BaseInteraction):
             :meth:`~discord.ApplicationCommandInteraction.defer` or
             :meth:`~discord.ApplicationCommandInteraction.respond`.
         """
-        await super()._premium_required()
+        return await super()._premium_required()
+
+    async def respond_with_launch_activity(self) -> None:
+        """|coro|
+        Respond by launching the activity associated with the application.
+        Only available for apps with :ddocs:`Activities <activities/overview>` enabled.
+
+        .. note::
+            You must respond with this one directly, without using any of
+            :meth:`~discord.ApplicationCommandInteraction.defer` or
+            :meth:`~discord.ApplicationCommandInteraction.respond`.
+        """
+        return await super()._respond_with_launch_activity()
 
 
 class ComponentInteraction(BaseInteraction):
@@ -1421,10 +1448,23 @@ class ComponentInteraction(BaseInteraction):
 
         .. note::
             You must respond with this one directly, without using any of
-            :meth:`~discord.ApplicationCommandInteraction.defer` or
-            :meth:`~discord.ApplicationCommandInteraction.respond`.
+            :meth:`~discord.ComponentInteraction.defer` or
+            :meth:`~discord.ComponentInteraction.respond`.
         """
-        await super()._premium_required()
+        return await super()._premium_required()
+
+    async def respond_with_launch_activity(self) -> None:
+        """|coro|
+        Respond by launching the activity associated with the application.
+        Only available for apps with :ddocs:`Activities <activities/overview>` enabled.
+
+        .. note::
+            You must respond with this one directly, without using any of
+            :meth:`~discord.ComponentInteraction.defer` or
+            :meth:`~discord.ComponentInteraction.respond`.
+        """
+        return await super()._respond_with_launch_activity()
+
 
 class AutocompleteInteraction(BaseInteraction):
     """
@@ -1506,6 +1546,12 @@ class AutocompleteInteraction(BaseInteraction):
         raise NotImplementedError
 
     async def defer(self, *args, **kwargs):
+        raise NotImplementedError('You must directly respond to an autocomplete interaction.')
+
+    async def respond_with_premium_required(self) -> None:
+        raise NotImplementedError('You must directly respond to an autocomplete interaction.')
+
+    async def respond_with_launch_activity(self) -> None:
         raise NotImplementedError('You must directly respond to an autocomplete interaction.')
 
 
@@ -1644,10 +1690,22 @@ class ModalSubmitInteraction(BaseInteraction):
 
         .. note::
             You must respond with this one directly, without using any of
-            :meth:`~discord.ApplicationCommandInteraction.defer` or
-            :meth:`~discord.ApplicationCommandInteraction.respond`.
+            :meth:`~discord.ModalSubmitInteraction.defer` or
+            :meth:`~discord.ModalSubmitInteraction.respond`.
         """
         await super()._premium_required()
+
+    async def respond_with_launch_activity(self) -> None:
+        """|coro|
+        Respond by launching the activity associated with the application.
+        Only available for apps with :ddocs:`Activities <activities/overview>` enabled.
+
+        .. note::
+            You must respond with this one directly, without using any of
+            :meth:`~discord.ModalSubmitInteraction.defer` or
+            :meth:`~discord.ModalSubmitInteraction.respond`.
+        """
+        return await super()._respond_with_launch_activity()
 
 
 class InteractionData:

@@ -156,7 +156,7 @@ class BaseComponent:
 
 
 class Button(BaseComponent):
-    """Represents a `Discord-Button <https://discord.com/developers/docs/interactions/message-components#button-object>`_"""
+    """Represents a :ddocs:`Discord-Button <interactions/message-components#button-object>`_"""
     __slots__ = ('_label', '_custom_id', '_style', '_url', '_disabled', '_sku_id')
 
     def __init__(
@@ -170,7 +170,7 @@ class Button(BaseComponent):
             disabled: bool = False
     ) -> None:
         """
-        Represents a `Discord-Button <https://discord.com/developers/docs/interactions/message-components#button-object>`_
+        Represents a :ddocs:`Discord-Button <interactions/message-components#button-object>`_ component.
 
         Parameters
         ----------

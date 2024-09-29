@@ -313,8 +313,11 @@ class Client:
         self._listeners = {}
         self.sync_commands: bool = options.get('sync_commands', False)
         self.delete_not_existing_commands: bool = options.get('delete_not_existing_commands', True)
-        self._application_commands_by_type: Dict[str, Dict[str, Union[SlashCommand, UserCommand, MessageCommand]]] = {
-            'chat_input': {}, 'message': {}, 'user': {}
+        self._application_commands_by_type: Dict[str, Union[
+            ActivityEntryPointCommand,
+            Dict[str, Union[SlashCommand, UserCommand, MessageCommand]]
+        ]] = {
+            'chat_input': {}, 'message': {}, 'user': {}, 'primary_entry_point': None
         }
         self._guild_specific_application_commands: Dict[
             int, Dict[str, Dict[str, Union[SlashCommand, UserCommand, MessageCommand]]]] = {}
@@ -2092,6 +2095,177 @@ class Client:
 
                 return command
         return decorator
+
+    def activity_primary_entry_point_command(
+            self,
+            name: Optional[str] = 'launch',
+            name_localizations: Localizations = Localizations(),
+            description: Optional[str] = '',
+            description_localizations: Localizations = Localizations(),
+            default_required_permissions: Optional[Permissions] = None,
+            allowed_contexts: Optional[List[InteractionContextType]] = None,
+            allowed_integration_types: Optional[List[AppIntegrationType]] = None,
+            is_nsfw: bool = False,
+    ) -> Callable[[Awaitable[Any]], SlashCommand]:
+        """
+        A decorator that sets the handler function for the
+        :ddocs:`primary entry point <interactions/application-commands#entry-point-commands>` of an activity.
+
+        **This overwrites the default activity command created by Discord.**
+
+        .. note::
+            If you only want to change the name, description, permissions, etc. of the default activity command,
+            use :meth:`update_activity_command` instead.
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The name of the activity command. Default to 'launch'.
+        name_localizations: :class:`Localizations`
+            Localized ``name``'s.
+        description: :class:`str`
+            The description of the activity command.
+        description_localizations: :class:`Localizations`
+            Localized ``description``'s.
+        default_required_permissions: Optional[:class:`Permissions`]
+            Permissions that a member needs by default to execute(see) the command.
+        allowed_contexts: Optional[List[:class:`~discord.InteractionContextType`]]
+            The contexts in which the command is available.
+            By default, commands are available in all contexts.
+        allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+            The types of app integrations where the command is available.
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+        is_nsfw: :class:`bool`
+            Whether this command is an `NSFW command <https://support.discord.com/hc/en-us/articles/10123937946007>`_, default :obj:`False`.
+        """
+
+        def decorator(func: Awaitable[Any]) -> SlashCommand:
+            if not asyncio.iscoroutinefunction(func):
+                raise TypeError('The activity command function registered must be a coroutine.')
+            cmd = SlashCommand(
+                func=func,
+                name=name,
+                name_localizations=name_localizations,
+                description=description,
+                description_localizations=description_localizations,
+                default_member_permissions=default_required_permissions,
+                contexts=allowed_contexts,
+                integration_types=allowed_integration_types,
+                is_nsfw=is_nsfw
+            )
+            self._activity_primary_entry_point_command = cmd
+            return cmd
+        return decorator
+
+    async def update_primary_entry_point_command(
+            self,
+            name: Optional[str] = MISSING,
+            name_localizations: Localizations = MISSING,
+            description: Optional[str] = MISSING,
+            description_localizations: Localizations = MISSING,
+            default_required_permissions: Optional[Permissions] = MISSING,
+            allowed_contexts: Optional[List[InteractionContextType]] = MISSING,
+            allowed_integration_types: Optional[List[AppIntegrationType]] = MISSING,
+            is_nsfw: bool = MISSING,
+            handler: EntryPointHandlerType = MISSING
+    ):
+        """|coro|
+
+        Update the `primary entry point command <interactions/application-commands#entry-point-commands>` of the application.
+
+        If you don't want to handle the command, set ``handler`` to :attr:`EntryPointHandlerType.discord`
+
+        Parameters
+        ----------
+        name: Optional[:class:`str`]
+            The name of the activity command.
+        name_localizations: :class:`Localizations`
+            Localized ``name``'s.
+        description: Optional[:class:`str`]
+            The description of the activity command.
+        description_localizations: :class:`Localizations`
+            Localized ``description``'s.
+        default_required_permissions: Optional[:class:`Permissions`]
+            Permissions that a member needs by default to execute(see) the command.
+        allowed_contexts: Optional[List[:class:`~discord.InteractionContextType`]]
+            The contexts in which the command is available.
+            By default, commands are available in all contexts.
+        allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+            The types of app integrations where the command is available.
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+        is_nsfw: :class:`bool`
+            Whether this command is an `NSFW command <https://support.discord.com/hc/en-us/articles/10123937946007>`_, default :obj:`False`.
+        handler: :class:`EntryPointHandlerType`
+            The handler for the primary entry point command.
+            Default to :attr:`EntryPointHandlerType.discord`, unless :attr:`.activity_primary_entry_point_command` is set.
+
+        Returns
+        -------
+        :class:`~discord.ActivityEntryPointCommand`
+            The updated primary entry point command.
+
+        Raises
+        ------
+        :exc:`~discord.HTTPException`
+            Editing the command failed.
+        """
+
+        if not (primary_entry_point_command := self._application_commands_by_type['primary_entry_point']):
+            #  Request global application commands to get the primary entry point command
+
+            # Update this if discord adds a way to get the primary entry point command directly
+            await self.http.get_application_commands(self.app.id)
+            commands = ApplicationCommand._sorted_by_type(self._application_commands_by_type)
+            if primary_entry_point_command := commands['primary_entry_point']:
+                self._application_commands_by_type['primary_entry_point'] = primary_entry_point_command
+            else:
+                # create a primary entry point command if it does not exist
+                primary_entry_point_command = ActivityEntryPointCommand(
+                    name='launch' if name is MISSING else name,
+                    name_localizations=None if name_localizations is MISSING else name_localizations,
+                    description='launch tis activity' if description is MISSING else description,
+                    description_localizations=None if description_localizations is MISSING else description_localizations,
+                    default_member_permissions=None if default_required_permissions is MISSING else default_required_permissions,
+                    contexts=None if allowed_contexts is MISSING else allowed_contexts,
+                    integration_types=None if allowed_integration_types is MISSING else allowed_integration_types,
+                    is_nsfw=False if is_nsfw is MISSING else is_nsfw,
+                    handler=EntryPointHandlerType.discord if handler is MISSING else handler
+                )
+
+                # Register the primary entry point command
+                return await self.http.create_application_command(
+                    self.app.id,
+                    primary_entry_point_command.to_dict()
+                )
+        else:
+            data = {}
+            if name is not MISSING:
+                data['name'] = name
+            if name_localizations is not MISSING:
+                data['name_localizations'] = name_localizations.to_dict() if name_localizations else None
+            if description is not MISSING:
+                data['description'] = description
+            if description_localizations is not MISSING:
+                data['description_localizations'] = description_localizations.to_dict() if description_localizations else None
+            if default_required_permissions is not MISSING:
+                data['default_member_permissions'] = default_required_permissions.value
+            if allowed_contexts is not MISSING:
+                data['contexts'] = [ctx.value for ctx in allowed_contexts]
+            if allowed_integration_types is not MISSING:
+                data['integration_types'] = [integration_type.value for integration_type in allowed_integration_types]
+            if is_nsfw is not MISSING:
+                data['is_nsfw'] = is_nsfw
+            if handler is not MISSING:
+                data['handler'] = handler.value
+
+            response = await self.http.edit_application_command(self.app.id, primary_entry_point_command.id, data)
+            new_command = primary_entry_point_command.from_dict(self._connection, response)
+
+            if (callback := primary_entry_point_command.func) and handler != EntryPointHandlerType.discord:
+                new_command.func = callback
+
+            self._application_commands_by_type['primary_entry_point'] = new_command
+            return new_command
 
     def message_command(
             self,
