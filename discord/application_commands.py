@@ -36,6 +36,7 @@ from typing import (
     Type,
     TYPE_CHECKING,
     Union,
+    Set,
 )
 
 from typing_extensions import Literal
@@ -53,10 +54,13 @@ from .channel import PartialMessageable
 from .enums import (
     Enum as DiscordEnum,
     ApplicationCommandType,
-    ChannelType,
-    OptionType,
-    Locale,
     AppCommandPermissionType,
+    AppIntegrationType,
+    ChannelType,
+    EntryPointHandlerType,
+    InteractionContextType,
+    Locale,
+    OptionType,
     try_enum,
 )
 from .permissions import Permissions
@@ -297,15 +301,31 @@ class ApplicationCommand:
         self._disabled = False
         self.func = kwargs.pop('func', None)
         self.cog = kwargs.get('cog', None)
+        self.integration_types: Optional[Set[AppIntegrationType]] = {
+            try_enum(AppIntegrationType, it) for it in i_types
+        } if (i_types := kwargs.get('integration_types')) else None
+        self.contexts: Set[InteractionContextType] = {
+            try_enum(InteractionContextType, ct) for ct in (kwargs.get('contexts', []) or [])
+        }
         dp = kwargs.get('default_permission', None)
         if dp is not None:
-            warnings.warn('default_permission is deprecated, use default_member_permissions and allow_dm instead.',
-                          stacklevel=3, category=DeprecationWarning
-                          )
+            warnings.warn(
+                'default_permission is deprecated, use default_member_permissions and contexts instead.',
+                stacklevel=3,
+                category=DeprecationWarning
+            )
         dmp = kwargs.get('default_member_permissions', None)
         self.default_member_permissions: Optional[Permissions] = (
-            Permissions(int(dmp)) if dmp is not None else None) if not isinstance(dmp, Permissions) else dmp
-        self.allow_dm = kwargs.get('allow_dm', True)
+            Permissions(int(dmp) if dmp is not None else None) if not isinstance(dmp, Permissions) else dmp
+        )
+        if (ad := kwargs.get('allow_dm', None)) is not None:
+            warnings.warn(
+                'allow_dm is deprecated, use default_member_permissions and contexts instead.',
+                stacklevel=3,
+                category=DeprecationWarning
+            )
+
+        self.allow_dm = ad or (InteractionContextType.bot_dm in self.contexts)
         self.name_localizations: Localizations = kwargs.get('name_localizations', Localizations())
         self.description_localizations: Localizations = kwargs.get('description_localizations', Localizations())
 
@@ -394,14 +414,24 @@ class ApplicationCommand:
             else:
                 options = []
             dmp = str(self.default_member_permissions.value) if self.default_member_permissions else None
-            return bool(int(self.type) == other.get('type') and self.name == other.get('name', None)
-                        and self.name_localizations.to_dict() == other.get('name_localizations', None)
-                        and getattr(self, 'description', '') == other.get('description', '')
-                        and self.description_localizations.to_dict() == other.get('description_localizations', None)
-                        and dmp == other.get('default_member_permissions', None)
-                        and self.allow_dm == other.get('dm_permission', True)
-                        and check_options(options, other.get('options', []))
-                        )
+            return (
+                    int(self.type) == other.get('type') and self.name == other.get('name', None)
+                    and self.name_localizations.to_dict() == other.get('name_localizations', None)
+                    and getattr(self, 'description', '') == other.get('description', '')
+                    and self.description_localizations.to_dict() == other.get('description_localizations', None)
+                    and dmp == other.get('default_member_permissions', None)
+                    and self.allow_dm == other.get('dm_permission', True)
+                    and (
+                        not any((_other_ctxs := other.get('contexts'), self.contexts))
+                        or not {ctx.value for ctx in self.contexts}.symmetric_difference(_other_ctxs)
+                    )
+                    and (
+                        not any((_other_itg_tps := other.get('integration_types'), self.integration_types))
+                        or not {itg_type.value for itg_type in self.integration_types}
+                        .symmetric_difference(_other_itg_tps)
+                    )
+                    and check_options(options, other.get('options', []))
+            )
         return False
 
     def __ne__(self, other) -> bool:
@@ -464,12 +494,15 @@ class ApplicationCommand:
             'type': int(self.type),
             'name': str(self.name),
             'nsfw': self.is_nsfw,
+            'contexts': [ctx.value for ctx in self.contexts] if self.contexts else None,
+            'integration_types': [it.value for it in self.integration_types] if self.integration_types else None,
             'name_localizations': self.name_localizations.to_dict(),
             'description': getattr(self, 'description', ''),
             'description_localizations': self.description_localizations.to_dict(),
             'default_member_permissions': str(self.default_member_permissions.value
                                               ) if self.default_member_permissions else None
         }
+
         if not self.guild_id:
             base['dm_permission'] = self.allow_dm
         if hasattr(self, 'options'):

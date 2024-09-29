@@ -56,9 +56,11 @@ from .enums import (
     Locale,
     ChannelType,
     InteractionCallbackType,
-    InteractionType, Locale,
+    InteractionType,
     MessageType,
     OptionType,
+    InteractionContextType,
+    AppIntegrationType,
     try_enum
 )
 from .errors import AlreadyResponded, HTTPException, NotFound, UnknownInteraction
@@ -81,8 +83,10 @@ if TYPE_CHECKING:
         Interaction as InteractionPayload,
         InteractionData as InteractionDataPayload,
         ApplicationCommandInteractionDataOption as ApplicationCommandInteractionDataOptionPayload,
-        ResolvedData as ResolvedDataPayload
+        ResolvedData as ResolvedDataPayload,
+        AuthorizingIntegrationOwners as AuthorizingIntegrationOwnersPayload
     )
+    from .types.message import Message as MessagePayload
     from .state import ConnectionState
     from .components import BaseSelect
     from .application_commands import SlashCommandOptionChoice, SlashCommand, MessageCommand, UserCommand
@@ -451,9 +455,36 @@ class EphemeralMessage:
             )
 
 
+class AuthorizingIntegrationOwners:
+    """
+    Includes details about the authorizing user or server (guild) for the installation(s) relevant to the interaction.
+    For apps installed to a user, it can be used to tell the difference between the authorizing user and the user
+    that triggered an interaction (like a message component).
+
+    An attribute will only be present if the following are true:
+
+    - The app has been authorized to the installation context (see :class:`~discord.AppIntegrationType`)
+    - The interaction is supported in the source :class:`~discord.InteractionContextType` for the installation context
+      corresponding to the key
+    - And for command invocations, the command must be supported in the installation context (using `integration_types`)
+
+    The values depend on the source of the interaction:
+
+    If the key is :attr:`~discord.AppIntegrationType.guild_install`, the value depends on the source of the interaction:
+        The value will be the guild ID if the interaction is triggered from a server
+        The value will be "0" if the interaction is triggered from a DM with the app's bot user
+    If the key is :attr:`~discord.AppIntegrationType.user_install`, the value will be the ID of the authorizing user
+    """
+    def __init__(self, data: AuthorizingIntegrationOwnersPayload, state: ConnectionState):
+        self._data = data
+
+    def __repr__(self):
+        return f'<AuthorizingIntegrationOwners {self._data!r}>'
+
+
 class BaseInteraction:
     """
-    The Base-Class for a discord-interaction like klick a :class:`~discord.Button`,
+    The Base-Class for a discord-interaction like clicking a :class:`~discord.Button`,
     select (an) option(s) of :class:`~discord.SelectMenu` or using an application-command in discord
     For more general information's about Interactions visit the Documentation of the
     `Discord-API <https://discord.com/developers/docs/interactions/receiving-and-responding#interaction-object>`_
@@ -475,6 +506,20 @@ class BaseInteraction:
         and optionally, if any.
 
         This is available for all interaction types.
+    context: Optional[:class:`~discord.InteractionContextType`]
+        The context of the interaction, if any.
+    authorizing_guild_id: Optional[:class:`int`]
+        Depending on the context of the interaction, the guild ID where the app integration was authorized to:
+            - The value will be the guild ID if the interaction is triggered from a server
+            - The value will be `0` if the interaction is triggered from a DM with the app's bot user
+
+        .. seealso::
+            :attr:`.authorizing_guild`
+    authorizing_user_id: Optional[:class:`int`]
+        The ID of the user the app integration is authorized to, if any.
+
+        .. seealso::
+            :attr:`.authorizing_user`
     data: :class:`~discord.InteractionData`
         Some internal needed metadata for the interaction, depending on the type.
     author_locale: Optional[:class:`~discord.Locale`]
@@ -495,6 +540,9 @@ class BaseInteraction:
     if TYPE_CHECKING:
         type: InteractionType
         id: int
+        context: Optional[InteractionContextType]  # Why is this optional?
+        authorizing_guild_id: Optional[int]
+        authorizing_user_id: Optional[int]
         guild_id: Optional[int]
         channel_id: int
         user_id: int
@@ -517,6 +565,10 @@ class BaseInteraction:
         self._token = data['token']
         self.type = InteractionType.try_value(data['type'])
         self.id = int(data['id'])
+        self.context = try_enum(data.get('context'), InteractionContextType)
+        authorizing_integration_owners = data.get('authorizing_integration_owners')
+        self.authorizing_guild_id = utils._get_as_snowflake(authorizing_integration_owners, '0')
+        self.authorizing_user_id = utils._get_as_snowflake(authorizing_integration_owners, '1')
         self.guild_id = guild_id = utils._get_as_snowflake(data, 'guild_id')
         self.entitlements = {Entitlement(data=e, state=state) for e in data.get('entitlements', [])}
         channel_data = data.get('channel', {})
@@ -524,15 +576,18 @@ class BaseInteraction:
 
         guild = self.guild or Object(id=guild_id) if guild_id else None  # I'm not sure if we need the Object thing here
         channel, member = (None, None)
-        
+
         if guild:
             member_data = data.get('member')
             user_data = member_data.get('user')
             self.user_id = user_id = int(user_data['id'])
+
             if isinstance(guild, Guild):
                 channel = guild.get_channel(self.channel_id)
                 member = guild.get_member(user_id)
-            self.member = member or Member(state=state, data=member_data, guild=guild)  # consider updating the member here
+
+            self.member = member or Member(state=state, data=member_data, guild=guild)
+            # consider updating the member here
             self.author_permissions = Permissions(int(member_data.get('permissions', 0)))
             self.guild_locale = try_enum(Locale, data.get('guild_locale'))
         else:
@@ -543,9 +598,8 @@ class BaseInteraction:
             self.member = None
             self.guild_locale = None
             self.user_id = int(user_data['id'])
-            
-        self.user = state.store_user(user_data)
 
+        self.user = state.store_user(user_data)
 
         if not channel:
             factory, ch_type = _channel_factory(channel_data['type'])
@@ -563,7 +617,7 @@ class BaseInteraction:
 
         self._channel = channel
 
-        message_data = data.get('message')
+        message_data: MessagePayload = data.get('message')
         if message_data is not None:
             if MessageFlags._from_value(message_data['flags']).ephemeral:
                 self.message = EphemeralMessage(state=state, channel=channel, data=message_data, interaction=self)
@@ -577,9 +631,9 @@ class BaseInteraction:
             self.cached_message = None
             self.message_id = None
 
-        interaction_data = data.get('data')
+        interaction_data: InteractionDataPayload = data.get('data')
         if interaction_data is not None:
-            self.data = InteractionData(data=interaction_data,state=state, guild=self.guild, channel_id=self.channel_id)
+            self.data = InteractionData(data=interaction_data, state=state, guild=self.guild, channel_id=self.channel_id)
         else:
             self.data = None
 
@@ -594,10 +648,35 @@ class BaseInteraction:
     def __repr__(self) -> str:
         """Represents a :class:`~discord.BaseInteraction` object."""
         return f'<{self.__class__.__name__} {", ".join([f"{k}={v}" for k, v in self.__dict__.items() if k[0] != "_"])}>'
-    
+
+    @property
+    def authorizing_guild(self) -> Optional[Union[Guild, Object]]:
+        """Optional[Union[:class:`~discord.Guild`, :class:`~discord.Object`]]: The guild where the app integration was
+            authorized to. If not cached this will return an :class:`~discord.Object` with the ID set to the guild ID.
+
+
+        .. note::
+            This is only available for interactions that were triggered in a guild, in a DM this will be ``None``.
+        """
+        if self.authorizing_guild_id:
+            return self._state._get_guild(self.authorizing_guild_id) or Object(id=self.authorizing_guild_id)
+        return None
+
+    @property
+    def authorizing_user(self) -> Optional[User]:
+        """Optional[Union[:class:`~discord.User`, :class:`~discord.Object`]]: The user the app integration is
+            authorized to, if any.
+            If not cached this will return an :class:`~discord.Object` with the ID set to the user ID.
+        """
+        if self.authorizing_user_id:
+            return self._state.get_user(self.authorizing_user_id) or Object(id=self.authorizing_user_id)
+        return None
+
     @property
     def callback_message(self) -> Optional[Union[Message, EphemeralMessage]]:
-        """Optional[Union[:class:`Message`, :class:`EphemeralMessage`]: The initial interaction response message, if any. (``@original``)"""
+        """
+        Optional[Union[:class:`Message`, :class:`EphemeralMessage`]: The initial interaction response message, if any.
+        """
         return self._callback_message
     
     @callback_message.setter
@@ -1111,7 +1190,7 @@ class BaseInteraction:
         return getattr(
             self,
             '_channel',
-            self.guild.get_channel(self.channel_id) if self.guild_id else self._state.get_channel(self.channel_id)
+            self.guild.get_channel(self.channel_id) if isinstance(self.guild, Guild) else self._state.get_channel(self.channel_id)
         ) or PartialMessageable(state=self._state, id=self.channel_id, guild_id=self.guild_id)
 
     @channel.setter

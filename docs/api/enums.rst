@@ -294,29 +294,33 @@ of :class:`enum.Enum`.
 
    The possible styles for a :class:`~discord.Button`
 
-   +------------------------+-------+----------------+--------------------------------+
-   | NAME                   | VALUE | ALIASES        | EXAMPLE                        |
-   +========================+=======+================+================================+
-   | .. attribute:: blurple |   1   |                | .. image:: /imgs/blurple.png   |
-   |                        |       | ``Primary``    |    :alt: Blurple Button Picture|
-   |                        |       |                |                                |
-   +------------------------+-------+----------------+--------------------------------+
-   | .. attribute:: grey    |   2   | ``gray``,      | .. image:: /imgs/grey.png      |
-   |                        |       | ``Secondary``  |    :alt: Grey Button Picture   |
-   |                        |       |                |                                |
-   +------------------------+-------+----------------+--------------------------------+
-   | .. attribute:: green   |   3   | ``Success``    | .. image:: /imgs/green.png     |
-   |                        |       |                |    :alt: Green Button Picture  |
-   |                        |       |                |                                |
-   +------------------------+-------+----------------+--------------------------------+
-   | .. attribute:: red     |   4   | ``Danger``     | .. image:: /imgs/red.png       |
-   |                        |       |                |    :alt: Red Button Picture    |
-   |                        |       |                |                                |
-   +------------------------+-------+----------------+--------------------------------+
-   | .. attribute:: url     |   5   | ``link``,      | .. image:: /imgs/url.png       |
-   |                        |       | ``grey_url``,  |    :alt: URL Button Picture    |
-   |                        |       | ``Link_Button``|                                |
-   +------------------------+-------+----------------+--------------------------------+
+   +------------------------+-------+----------------+---------------------------------+
+   | NAME                   | VALUE | ALIASES        | EXAMPLE                         |
+   +========================+=======+================+=================================+
+   | .. attribute:: blurple |   1   |                | .. image:: /imgs/blurple.png    |
+   |                        |       | ``Primary``    |    :alt: Blurple Button Picture |
+   |                        |       |                |                                 |
+   +------------------------+-------+----------------+---------------------------------+
+   | .. attribute:: grey    |   2   | ``gray``,      | .. image:: /imgs/grey.png       |
+   |                        |       | ``Secondary``  |    :alt: Grey Button Picture    |
+   |                        |       |                |                                 |
+   +------------------------+-------+----------------+---------------------------------+
+   | .. attribute:: green   |   3   | ``Success``    | .. image:: /imgs/green.png      |
+   |                        |       |                |    :alt: Green Button Picture   |
+   |                        |       |                |                                 |
+   +------------------------+-------+----------------+---------------------------------+
+   | .. attribute:: red     |   4   | ``Danger``     | .. image:: /imgs/red.png        |
+   |                        |       |                |    :alt: Red Button Picture     |
+   |                        |       |                |                                 |
+   +------------------------+-------+----------------+---------------------------------+
+   | .. attribute:: url     |   5   | ``link``,      | .. image:: /imgs/url.png        |
+   |                        |       | ``grey_url``,  |    :alt: URL Button Picture     |
+   |                        |       | ``Link_Button``|                                 |
+   +------------------------+-------+----------------+---------------------------------+
+   | .. attribute:: Premium |   6   |                | .. image:: /imgs/premium.png    |
+   |                        |       |                |    :alt: Premium Button Picture |
+   +------------------------+-------+----------------+---------------------------------+
+
 
 .. class:: InteractionType
 
@@ -380,6 +384,72 @@ of :class:`enum.Enum`.
    |                                         |       |                                                  |                             |    .. image:: /imgs/ict7example.gif        |
    |                                         |       |                                                  |                             |       :alt: Example for update_msg         |
    +-----------------------------------------+-------+--------------------------------------------------+-----------------------------+--------------------------------------------+
+
+   (Autocomplete and Modal are missing here)
+
+.. class:: InteractionContextType
+
+    Context in Discord where an interaction can be used, or where it was triggered from.
+
+    .. versionadded:: 2.0
+
+    .. attribute:: guild
+
+        The interaction can be used within a guild (server)
+
+    .. attribute:: bot_dm
+
+        The interaction can be used within DMs with the app's bot user
+
+    .. attribute:: private_channel
+
+        The interaction can be used within Group DMs and DMs other than the app's bot user
+
+    .. seealso::
+
+        - :attr:`~discord.ApplicationCommandInteraction.context` to check where the interaction was triggered from
+        - ``context`` parameter in :func:`~discord.Client.slash_command`, :func:`~discord.Client.user_command` and
+          :func:`~discord.Client.message_command` as well as their respective :ref:`Cog methods <ext_commands_api_cogs>`
+
+
+.. class:: AppIntegrationType
+
+    Where an app can be installed :ddocs:`More info <resources/application#installation-context>`.
+    Also used in app-commands to specify in which present context the command can be used.
+
+    .. versionadded:: 2.0
+
+    .. attribute:: guild_install
+
+        The app can be installed in a guild (server)
+
+    .. attribute:: user_install
+
+        The app can be installed to a User - making it usable everywhere across discord
+
+
+.. class:: EntryPointHandlerType
+
+    How a :class:`~discord.PrimaryEntryPointCommand` is handled.
+
+    .. versionadded:: 2.0
+
+    .. attribute:: app_handler
+
+        The command is handled by the app itself so you can decide how to respond.
+
+    .. attribute:: discord_launch_activity
+
+        Discord handles the interaction by launching your apps activity and sending a follow-up message without
+        coordinating with the app.
+
+    .. attribute:: self
+
+        An alias for :attr:`app_handler`
+
+    .. attribute:: discord
+
+        An alias for :attr:`discord_launch_activity`
 
 .. class:: Locale
 

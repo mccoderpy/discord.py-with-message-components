@@ -50,6 +50,7 @@ from .snowflake import SnowflakeID
 from .user import BaseUser, MemberWithUser, PartialMember
 
 __all__ = (
+    'AuthorizingIntegrationOwners',
     'PingInteraction',
     'ApplicationCommandInteraction',
     'ComponentInteraction',
@@ -66,12 +67,15 @@ __all__ = (
 
 InteractionType = Literal[1, 2, 3, 4, 5]
 ApplicationCommandType = Literal[1, 2, 3]
+ContextType = Literal[1, 2, 3]
+AppIntegrationType = Literal[1, 2]
 
 
 class PartialInteractionGuild(TypedDict):
     locale: str
     id: SnowflakeID
     features: List[str]
+
 
 class ResolvedData(TypedDict):
     users: NotRequired[Dict[SnowflakeID, BaseUser]]
@@ -117,12 +121,19 @@ class PingInteraction(TypedDict):
     application_id: SnowflakeID
 
 
+class AuthorizingIntegrationOwners(TypedDict):
+    Literal['0']: NotRequired[SnowflakeID]  # Guild ID or 0 in a DM with the Bot
+    Literal['1']: NotRequired[SnowflakeID]  # User ID
+
+
 class BaseInteraction(TypedDict):
     id: SnowflakeID
     application_id: SnowflakeID
     token: str
     version: int
     locale: str
+    authorizing_integration_owners: AppIntegrationType
+    context: NotRequired[ContextType]
     guild_id: NotRequired[SnowflakeID]
     channel_id: NotRequired[SnowflakeID]
     channel: NotRequired[PartialChannel]

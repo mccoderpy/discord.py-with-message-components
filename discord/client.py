@@ -54,6 +54,7 @@ from typing import (
 
 from typing_extensions import Literal
 
+from .application_commands import ActivityEntryPointCommand
 from .auto_updater import AutoUpdateChecker
 from .sticker import StickerPack
 from .user import ClientUser, User
@@ -62,7 +63,8 @@ from .template import Template
 from .widget import Widget
 from .guild import Guild
 from .channel import _channel_factory, PartialMessageable
-from .enums import ChannelType, ApplicationCommandType, Locale
+from .enums import ChannelType, ApplicationCommandType, Locale, InteractionContextType, AppIntegrationType, \
+    EntryPointHandlerType
 from .mentions import AllowedMentions
 from .monetization import Entitlement, SKU
 from .errors import *
@@ -1731,6 +1733,8 @@ class Client:
             description: Optional[str] = None,
             description_localizations: Optional[Localizations] = Localizations(),
             allow_dm: bool = MISSING,
+            allowed_contexts: Optional[List[InteractionContextType]] = MISSING,
+            allowed_integration_types: Optional[List[AppIntegrationType]] = MISSING,
             is_nsfw: bool = MISSING,
             default_required_permissions: Optional[Permissions] = None,
             options: Optional[List] = [],
@@ -1758,9 +1762,11 @@ class Client:
 
         .. note::
             Any of the following parameters are only needed when the corresponding target was not used before
-            (e.g. there is already a command in the code that has these parameters set) - otherwise it will replace the previous value:
+            (e.g. there is already a command in the code that has these parameters set) - otherwise it will replace the previous value or update it for iterables.
 
             - ``allow_dm``
+            - ``allowed_contexts`` (update)
+            - ``allowed_integration_types`` (update)
             - ``is_nsfw``
             - ``base_name_localizations``
             - ``base_desc``
@@ -1782,8 +1788,15 @@ class Client:
         description_localizations: Optional[:class:`~discord.Localizations`]
             Localizations object for description field. Values follow the same restrictions as :attr:`description`
         allow_dm: Optional[:class:`bool`]
+            **Deprecated**: Use :attr:`allowed_contexts` instead.
             Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
             By default, commands are visible.
+        allowed_contexts: Optional[List[:class:`~discord.InteractionContextType`]]
+            **global commands only**: The contexts in which the command is available.
+            By default, commands are available in all contexts.
+        allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+            **global commands only**: The types of app integrations where the command is available.
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
         is_nsfw: :class:`bool`
             Whether this command is an `NSFW command <https://support.discord.com/hc/en-us/articles/10123937946007>`_, default :obj:`False`
 
@@ -2015,7 +2028,9 @@ class Client:
                             description_localizations=base_desc_localizations,
                             default_member_permissions=default_required_permissions,
                             allow_dm=allow_dm if allow_dm is not MISSING else True,
-                            is_nsfw=is_nsfw if is_nsfw is not MISSING else False
+                            is_nsfw=is_nsfw if is_nsfw is not MISSING else False,
+                            integration_types=allowed_integration_types if allowed_integration_types is not MISSING else None,
+                            contexts=allowed_contexts if allowed_contexts is not MISSING else None
                         )
                     else:
                         if base_desc:
@@ -2024,6 +2039,10 @@ class Client:
                             base_command.is_nsfw = is_nsfw
                         if allow_dm is not MISSING:
                             base_command.allow_dm = allow_dm
+                        if allowed_integration_types is not MISSING:
+                            base_command.integration_types.update(allowed_integration_types)
+                        if allowed_contexts is not MISSING:
+                            base_command.contexts.update(allowed_contexts)
                         base_command.name_localizations.update(base_name_localizations)
                         base_command.description_localizations.update(base_desc_localizations)
                     base = base_command
@@ -2064,6 +2083,8 @@ class Client:
                         description_localizations=description_localizations,
                         default_member_permissions=default_required_permissions,
                         allow_dm=allow_dm if allow_dm is not MISSING else True,
+                        integration_types=allowed_integration_types if allowed_integration_types is not MISSING else None,
+                        contexts=allowed_contexts if allowed_contexts is not MISSING else None,
                         is_nsfw=is_nsfw if is_nsfw is not MISSING else False,
                         options=_options,
                         connector=connector
@@ -2078,6 +2099,8 @@ class Client:
             name_localizations: Localizations = Localizations(),
             default_required_permissions: Optional[Permissions] = None,
             allow_dm: bool = True,
+            allowed_contexts: Optional[List[InteractionContextType]] = MISSING,
+            allowed_integration_types: Optional[List[AppIntegrationType]] = MISSING,
             is_nsfw: bool = False,
             guild_ids: Optional[List[int]] = None
     ) -> Callable[[Awaitable[Any]], MessageCommand]:
@@ -2100,8 +2123,15 @@ class Client:
         default_required_permissions: Optional[:class:`Permissions`]
             Permissions that a member needs by default to execute(see) the command.
         allow_dm: :class:`bool`
+            **Deprecated**: Use :attr:`allowed_contexts` instead.
             Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
             By default, commands are visible.
+        allowed_contexts: Optional[List[:class:`~discord.InteractionContextType`]]
+            **global commands only**: The contexts in which the command is available.
+            By default, commands are available in all contexts.
+        allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+            **global commands only**: The types of app integrations where the command is available.
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
         is_nsfw: :class:`bool`
             Whether this command is an `NSFW command <https://support.discord.com/hc/en-us/articles/10123937946007>`_, default :obj:`False`.
         guild_ids: Optional[List[:class:`int`]]
@@ -2128,6 +2158,8 @@ class Client:
                 name_localizations=name_localizations,
                 default_member_permissions=default_required_permissions,
                 allow_dm=allow_dm,
+                integration_types=allowed_integration_types if allowed_integration_types is not MISSING else None,
+                contexts=allowed_contexts if allowed_contexts is not MISSING else None,
                 is_nsfw=is_nsfw
             )
             if guild_ids:
@@ -2161,6 +2193,8 @@ class Client:
             name_localizations: Localizations = Localizations(),
             default_required_permissions: Optional[Permissions] = None,
             allow_dm: bool = True,
+            allowed_contexts: Optional[List[InteractionContextType]] = MISSING,
+            allowed_integration_types: Optional[List[AppIntegrationType]] = MISSING,
             is_nsfw: bool = False,
             guild_ids: Optional[List[int]] = None
     ) -> Callable[[Awaitable[Any]], UserCommand]:
@@ -2182,8 +2216,15 @@ class Client:
         default_required_permissions: Optional[:class:`Permissions`]
             Permissions that a member needs by default to execute(see) the command.
         allow_dm: :class:`bool`
+            **Deprecated**: Use :attr:`allowed_contexts` instead.
             Indicates whether the command is available in DMs with the app, only for globally-scoped commands.
             By default, commands are visible.
+        allowed_contexts: Optional[List[:class:`~discord.InteractionContextType`]]
+            **global commands only**: The contexts in which the command is available.
+            By default, commands are available in all contexts.
+        allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+            **global commands only**: The types of app integrations where the command is available.
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
         is_nsfw: :class:`bool`
             Whether this command is an `NSFW command <https://support.discord.com/hc/en-us/articles/10123937946007>`_, default :obj:`False`.
         guild_ids: Optional[List[:class:`int`]]
@@ -2210,6 +2251,8 @@ class Client:
                 name_localizations=name_localizations,
                 default_member_permissions=default_required_permissions,
                 allow_dm=allow_dm,
+                integration_types=allowed_integration_types if allowed_integration_types is not MISSING else None,
+                contexts=allowed_contexts if allowed_contexts is not MISSING else None,
                 is_nsfw=is_nsfw
             )
             if guild_ids:

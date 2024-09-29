@@ -45,6 +45,9 @@ __all__ = (
     'IntegrationType',
     'InteractionType',
     'InteractionCallbackType',
+    'AppIntegrationType',
+    'InteractionContextType',
+    'EntryPointHandlerType',
     'OptionType',
     'TimestampStyle',
     'Locale',
@@ -1168,6 +1171,26 @@ class EntitlementType(Enum):
     user_gift                   = 6
     premium_purchase            = 7
     application_subscription    = 8
+
+
+class AppIntegrationType(Enum):
+    guild_install = 0
+    user_install  = 1
+
+
+class InteractionContextType(Enum):
+    guild           = 1
+    bot_dm          = 2
+    private_channel = 3
+    user_dm         = 3
+    group_dm        = 3
+
+
+class EntryPointHandlerType(Enum):
+    app_handler             = 1
+    self                    = 1
+    discord_launch_activity = 2
+    discord                 = 2
 
 
 def try_enum(cls: Type[Enum], val: Any):
