@@ -646,9 +646,9 @@ class Cog(metaclass=CogMeta):
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
 
             .. note::
                 Currently all sub-commands of a command that is marked as *NSFW* are NSFW too.
@@ -988,9 +988,9 @@ class Cog(metaclass=CogMeta):
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
         guild_ids: Optional[List[:class:`int`]]
             ID's of guilds this command should be registered in. If empty, the command will be global.
 
@@ -1086,9 +1086,9 @@ class Cog(metaclass=CogMeta):
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
         guild_ids: Optional[List[:class:`int`]]
             ID's of guilds this command should be registered in. If empty, the command will be global.
 

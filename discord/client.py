@@ -1799,9 +1799,9 @@ class Client:
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
 
             .. note::
                 Currently all sub-commands of a command that is marked as *NSFW* are NSFW too.
@@ -2134,9 +2134,9 @@ class Client:
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`, default :obj:`False`.
 
         Returns
         -------
@@ -2205,9 +2205,9 @@ class Client:
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
         guild_ids: Optional[List[:class:`int`]]
             ID's of guilds this command should be registered in. If empty, the command will be global.
 
@@ -2296,11 +2296,11 @@ class Client:
         allowed_contexts: Optional[List[:class:`~discord.InteractionContextType`]]
             **global commands only**: The contexts in which the command is available.
             By default, commands are available in all contexts.
-         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
+        allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             **global commands only**: The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
         guild_ids: Optional[List[:class:`int`]]
             ID's of guilds this command should be registered in. If empty, the command will be global.
 
@@ -3273,9 +3273,9 @@ class Client:
             By default, commands are available in all contexts.
         allowed_integration_types: Optional[List[:class:`~discord.AppIntegrationType`]]
             The types of app integrations where the command is available.
-            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>_
+            Default to the app's :ddocs:`configured integration types <resources/application#setting-supported-installation-contexts>`
         is_nsfw: :class:`bool`
-            Whether this command is an `NSFW command <https://support.discord.com/hc/en-us/articles/10123937946007>`_, default :obj:`False`.
+            Whether this command is an :sup-art:`NSFW command <10123937946007-Age-Restricted-Commands>` , default :obj:`False`.
         handler: :class:`EntryPointHandlerType`
             The handler for the primary entry point command.
             Default to :attr:`EntryPointHandlerType.discord`, unless :attr:`.activity_primary_entry_point_command` is set.
