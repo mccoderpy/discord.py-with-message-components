@@ -54,15 +54,14 @@ from .channel import *
 from .raw_models import *
 from .member import Member
 from .role import Role
-from .enums import ChannelType, try_enum, Status, MessageType, ComponentType
+from .enums import ChannelType, try_enum, Status, MessageType, ComponentType, InteractionType
 from . import utils
 from .flags import Intents, MemberCacheFlags, ApplicationFlags
 from .object import Object
 from .invite import Invite
 from .automod import AutoModRule, AutoModActionPayload
-from .interactions import BaseInteraction, InteractionType
-from .monetization import Entitlement
-
+from .interactions import BaseInteraction
+from .monetization import Entitlement, Subscription
 
 if TYPE_CHECKING:
     from .http import HTTPClient
@@ -554,6 +553,18 @@ class ConnectionState:
     def parse_entitlement_delete(self, data):
         entitlement = Entitlement(data, self)
         self.dispatch('entitlement_delete', entitlement)
+
+    def parse_subscription_create(self, data):
+        subscription = Subscription(data, self)
+        self.dispatch('subscription_create', subscription)
+
+    def parse_subscription_update(self, data):
+        subscription = Subscription(data, self)
+        self.dispatch('subscription_update', subscription)
+
+    def parse_subscription_delete(self, data):
+        subscription = Subscription(data, self)
+        self.dispatch('subscription_delete', subscription)
 
     def parse_message_create(self, data):
         channel, _ = self._get_guild_channel(data)

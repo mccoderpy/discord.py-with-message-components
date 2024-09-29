@@ -35,3 +35,11 @@ Entitlement
 
 .. autoclass:: Entitlement()
     :members:
+
+Subscription
+~~~~~~~~~~~~
+
+.. attributetable:: Subscription
+
+.. autoclass:: Subscription()
+    :members:

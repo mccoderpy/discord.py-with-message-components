@@ -1174,6 +1174,11 @@ class EntitlementType(Enum):
     application_subscription    = 8
 
 
+class SubscriptionStatus(Enum):
+    active     = 0
+    ending     = 1
+    inactive   = 2
+
 class AppIntegrationType(Enum):
     guild_install = 0
     user_install  = 1

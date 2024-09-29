@@ -1787,3 +1787,26 @@ of :class:`enum.Enum`.
     .. attribute:: application_subscription
 
         Entitlement was purchased as an app subscription
+
+
+.. class:: SubscriptionStatus
+
+    Represent the :attr:`~discord.Subscription.status` of a subscription.
+
+    .. note::
+
+        Subscription status should not be used to grant perks.
+        Use :class:`~discord.Entitlement`s as an indication of whether a user should have access to a specific SKU.
+        See discords guid on :docs:`Implementing App Subscriptions <monetization/implementing-app-subscriptions> for more information.
+
+    .. attribute:: active
+
+        Subscription is active and scheduled to renew.
+
+    .. attribute:: ending
+
+        Subscription is active but will not renew.
+
+    .. attribute:: inactive
+
+        Subscription is inactive and not being charged.

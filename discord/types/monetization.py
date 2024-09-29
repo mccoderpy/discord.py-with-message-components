@@ -33,7 +33,7 @@
 #
 from __future__ import annotations
 
-from typing import TypedDict, Union
+from typing import TypedDict, Union, Optional, List
 
 from typing_extensions import Literal, NotRequired
 
@@ -43,10 +43,12 @@ __all__ = (
     'SKU',
     'TestEntitlement',
     'Entitlement',
+    'Subscription',
 )
 
 SKUType = Literal[1, 2, 3, 4, 5, 6]
 EntitlementType = Literal[1, 2, 3, 4, 5, 6, 7, 8]
+SubscriptionStatus = Literal[0, 1, 2]
 
 
 class SKU(TypedDict):
@@ -73,6 +75,18 @@ class Entitlement(TestEntitlement):
     subscription_id: SnowflakeID
     starts_at: str
     ends_at: str
+
+
+class Subscription(TypedDict):
+    id: SnowflakeID
+    user_id: SnowflakeID
+    sku_ids: List[SnowflakeID]
+    entitlement_ids: List[SnowflakeID]
+    starts_at: str
+    ends_at: str
+    status: SubscriptionStatus
+    canceled_at: Optional[str]
+    country: NotRequired[str]
 
 
 EntitlementData = Union[TestEntitlement, Entitlement]

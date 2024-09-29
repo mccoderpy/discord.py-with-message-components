@@ -33,13 +33,13 @@
 #
 from __future__ import annotations
 
-from typing import Optional, Union, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING, List
 from datetime import datetime
 
 from .types import monetization as m
 
 from . import utils
-from .enums import SKUType, EntitlementType, try_enum
+from .enums import SKUType, EntitlementType, try_enum, SubscriptionStatus
 from .flags import SKUFlags
 
 if TYPE_CHECKING:
@@ -50,6 +50,7 @@ if TYPE_CHECKING:
 __all__ = (
     'SKU',
     'Entitlement',
+    'Subscription',
 )
 
 
@@ -175,3 +176,56 @@ class Entitlement:
 
     # TODO: Add additional attributes used for gift entitlements
     # TODO: Finish documentation
+
+
+class Subscription:
+    """
+    Subscriptions in Discord represent a user making recurring payments for at least one SKU over an ongoing period.
+    Successful payments grant the user access to entitlements associated with the SKU.
+
+    .. versionadded:: 2.0
+
+    Attributes
+    ----------
+    id: :class:`int`
+        The ID of the subscription
+    user_id: :class:`int`
+        The ID of the user that is subscribed to the SKU(s)
+    sku_ids: List[:class:`int`]
+        List of SKU IDs the user is subscribed to
+    entitlement_ids: List[:class:`int`]
+        List of entitlements granted for this subscription
+    current_period_start: :class:`~datetime.datetime`
+        Start date of the current subscription period
+    current_period_end: :class:`~datetime.datetime`
+        End date of the current subscription period
+    status: :class:`~discord.SubscriptionStatus`
+        The status of the subscription
+    canceled_at: Optional[:class:`~datetime.datetime`]
+        Time at which the subscription was canceled
+    country_code: Optional[:class:`str`]
+        The country code of the user.
+
+        ISO3166-1 alpha-2 country code of the payment source used to purchase the subscription.
+        Missing unless queried with a private OAuth scope.
+    """
+
+    def __init__(self, data: m.Subscription, state: ConnectionState):
+        self.id: int = int(data['id'])
+        self.user_id: int = int(data['user_id'])
+        self.sku_ids: List[int] = [int(sku_id) for sku_id in data['sku_ids']]
+        self.entitlement_ids: List[int] = [int(entitlement_id) for entitlement_id in data['entitlement_ids']]
+        self.current_period_start: datetime = utils.parse_time(data['starts_at'])
+        self.current_period_end: datetime = utils.parse_time(data['ends_at'])
+        self.status: SubscriptionStatus = try_enum(SubscriptionStatus, data['status'])
+        self.canceled_at: Optional[datetime] = utils.parse_time(data.get('canceled_at'))
+        self.country_code: Optional[str] = data.get('country')
+        self._state: ConnectionState = state
+
+    def __repr__(self) -> str:
+        return f'<Subscription id={self.id} user_id={self.user_id} status={self.status.name}>'
+
+    @property
+    def user(self) -> User:
+        """The user that is subscribed to the SKU(s)"""
+        return self._state.get_user(self.user_id)

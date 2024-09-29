@@ -159,12 +159,11 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
 .. function:: on_entitlement_update(entitlement)
 
-    Called when a  user's subscription renews for the next billing period.
-    The :attr:`~Entitlement.ends_at` attribute will have an updated value with the new expiration date.
+   Sent when an entitlement is updated.
 
     .. attention::
         If a user's subscription is cancelled, you will **not** receive an :meth:`on_entitlement_delete` event.
-        Instead, you will **simply not receive an UPDATE event** with a new ends_at date **at the end of the billing period**.
+        When a user cancels, you will receive an `ENTITLEMENT_UPDATE` events with a valid :attr:`~discord.Entitlement.ends_at` value reflecting when their subscription ends
 
     .. versionadded:: 2.0
 
@@ -179,6 +178,7 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
         - Discord issues a refund for a subscription
         - Discord removes an entitlement from a user via internal tooling
+        - Discord deletes an app-managed entitlement they created via the API
 
     .. attention::
         Entitlements are not deleted when they expire.
@@ -187,6 +187,39 @@ to handle it, which defaults to print a traceback and ignoring the exception.
 
     :param entitlement: The entitlement that was deleted.
     :type entitlement: :class:`Entitlement`
+
+.. function:: on_subscription_create(subscription)
+
+    Called when a user subscribes to a SKU.
+
+    .. note::
+        A Subscription's `status` can be either **inactive** or **active** when this event is received.
+        You will receive subsequent :func:`on_subscription_update` events if the status is updated to **active**.
+
+        As a best practice, you should not grant any perks to users until the entitlements are created.
+
+    .. versionadded:: 2.0
+
+    :param subscription: The subscription that was created.
+    :type subscription: :class:`Subscription`
+
+.. function:: on_subscription_update(subscription)
+
+        Sent when a subscription is updated.
+
+        .. versionadded:: 2.0
+
+        :param subscription: The subscription that was updated.
+        :type subscription: :class:`Subscription`
+
+.. function:: on_subscription_delete(subscription)
+
+        Called when a user's subscription is deleted.
+
+        .. versionadded:: 2.0
+
+        :param subscription: The subscription that was deleted.
+        :type subscription: :class:`Subscription`
 
 .. function:: on_application_command_error(command, interaction, exception)
 
