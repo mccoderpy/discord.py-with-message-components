@@ -316,7 +316,7 @@ class ApplicationCommand:
             )
         dmp = kwargs.get('default_member_permissions', None)
         self.default_member_permissions: Optional[Permissions] = (
-            Permissions(int(dmp) if dmp is not None else None) if not isinstance(dmp, Permissions) else dmp
+            (Permissions(int(dmp)) if dmp is not None else None) if not isinstance(dmp, Permissions) else dmp
         )
         if (ad := kwargs.get('allow_dm', None)) is not None:
             warnings.warn(
@@ -430,8 +430,8 @@ class ApplicationCommand:
                         or not {ctx.value for ctx in self.contexts}.symmetric_difference(_other_ctxs)
                     )
                     and (
-                        not any((_other_itg_tps := other.get('integration_types'), self.integration_types))
-                        or not {itg_type.value for itg_type in self.integration_types}
+                        not any((_other_itg_tps := other.get('integration_types', set()), self.integration_types))
+                        or not {itg_type.value for itg_type in (self.integration_types or set())}
                         .symmetric_difference(_other_itg_tps)
                     )
                     and check_options(options, other.get('options', []))
