@@ -313,11 +313,11 @@ class Client:
         self._listeners = {}
         self.sync_commands: bool = options.get('sync_commands', False)
         self.delete_not_existing_commands: bool = options.get('delete_not_existing_commands', True)
-        self._application_commands_by_type: Dict[str, Union[
-            ActivityEntryPointCommand,
-            Dict[str, Union[SlashCommand, UserCommand, MessageCommand]]
-        ]] = {
-            'chat_input': {}, 'message': {}, 'user': {}, 'primary_entry_point': None
+        self._application_commands_by_type: Dict[
+            str,
+            Dict[str, Union[SlashCommand, UserCommand, MessageCommand, ActivityEntryPointCommand]]
+        ] = {
+            'chat_input': {}, 'message': {}, 'user': {}, 'primary_entry_point': {}
         }
         self._guild_specific_application_commands: Dict[
             int, Dict[str, Dict[str, Union[SlashCommand, UserCommand, MessageCommand]]]] = {}
@@ -2152,9 +2152,10 @@ class Client:
         def decorator(func: Awaitable[Any]) -> SlashCommand:
             if not asyncio.iscoroutinefunction(func):
                 raise TypeError('The activity command function registered must be a coroutine.')
+            _name = name or func.__name__
             cmd = SlashCommand(
                 func=func,
-                name=name,
+                name=_name,
                 name_localizations=name_localizations,
                 description=description,
                 description_localizations=description_localizations,
@@ -2163,6 +2164,7 @@ class Client:
                 integration_types=allowed_integration_types,
                 is_nsfw=is_nsfw
             )
+            self._application_commands_by_type['primary_entry_point'][_name] = cmd
             self._activity_primary_entry_point_command = cmd
             return cmd
         return decorator
@@ -3291,15 +3293,17 @@ class Client:
             Editing the command failed.
         """
 
-        if not (primary_entry_point_command := self._application_commands_by_type['primary_entry_point']):
+        try:
+            primary_entry_point_command = list(self._application_commands_by_type['primary_entry_point'].values())[0]
+        except IndexError:
             #  Request global application commands to get the primary entry point command
 
             # Update this if discord adds a way to get the primary entry point command directly
-            await self.http.get_application_commands(self.app.id)
-            commands = ApplicationCommand._sorted_by_type(self._application_commands_by_type)
-            if primary_entry_point_command := commands['primary_entry_point']:
-                self._application_commands_by_type['primary_entry_point'] = primary_entry_point_command
-            else:
+            commands_raw = await self.http.get_application_commands(self.app.id)
+            commands_sorted = ApplicationCommand._sorted_by_type(commands_raw)
+            try:
+                primary_entry_point_command = commands_sorted['primary_entry_point'][0]
+            except IndexError:
                 # create a primary entry point command if it does not exist
                 primary_entry_point_command = ActivityEntryPointCommand(
                     name='launch' if name is MISSING else name,
@@ -3313,37 +3317,43 @@ class Client:
                     handler=EntryPointHandlerType.discord if handler is MISSING else handler
                 )
 
+                self._application_commands_by_type['primary_entry_point'][primary_entry_point_command.name] = primary_entry_point_command
+
                 # Register the primary entry point command
-                return await self.http.create_application_command(
+                data = await self.http.create_application_command(
                     self.app.id,
                     primary_entry_point_command.to_dict()
                 )
-        else:
-            data = {}
-            if name is not MISSING:
-                data['name'] = name
-            if name_localizations is not MISSING:
-                data['name_localizations'] = name_localizations.to_dict() if name_localizations else None
-            if description is not MISSING:
-                data['description'] = description
-            if description_localizations is not MISSING:
-                data['description_localizations'] = description_localizations.to_dict() if description_localizations else None
-            if default_required_permissions is not MISSING:
-                data['default_member_permissions'] = default_required_permissions.value
-            if allowed_contexts is not MISSING:
-                data['contexts'] = [ctx.value for ctx in allowed_contexts]
-            if allowed_integration_types is not MISSING:
-                data['integration_types'] = [integration_type.value for integration_type in allowed_integration_types]
-            if is_nsfw is not MISSING:
-                data['is_nsfw'] = is_nsfw
-            if handler is not MISSING:
-                data['handler'] = handler.value
+                primary_entry_point_command._fill_data(data)
+                self._application_commands[primary_entry_point_command.id] = primary_entry_point_command
+                return primary_entry_point_command
 
-            response = await self.http.edit_application_command(self.app.id, primary_entry_point_command.id, data)
-            new_command = primary_entry_point_command.from_dict(self._connection, response)
+        data = {}
+        if name is not MISSING:
+            data['name'] = name
+        if name_localizations is not MISSING:
+            data['name_localizations'] = name_localizations.to_dict() if name_localizations else None
+        if description is not MISSING:
+            data['description'] = description
+        if description_localizations is not MISSING:
+            data['description_localizations'] = description_localizations.to_dict() if description_localizations else None
+        if default_required_permissions is not MISSING:
+            data['default_member_permissions'] = default_required_permissions.value
+        if allowed_contexts is not MISSING:
+            data['contexts'] = [ctx.value for ctx in allowed_contexts]
+        if allowed_integration_types is not MISSING:
+            data['integration_types'] = [integration_type.value for integration_type in allowed_integration_types]
+        if is_nsfw is not MISSING:
+            data['is_nsfw'] = is_nsfw
+        if handler is not MISSING:
+            data['handler'] = handler.value
 
-            if (callback := primary_entry_point_command.func) and handler != EntryPointHandlerType.discord:
-                new_command.func = callback
+        response = await self.http.edit_application_command(self.app.id, primary_entry_point_command.id, data)
+        new_command = primary_entry_point_command.from_dict(self._connection, response)
 
-            self._application_commands_by_type['primary_entry_point'] = new_command
-            return new_command
+        if (callback := primary_entry_point_command.func) and handler != EntryPointHandlerType.discord:
+            new_command.func = callback
+
+        self._application_commands_by_type['primary_entry_point'][new_command.name] = new_command
+        self._application_commands[new_command.id] = new_command
+        return new_command

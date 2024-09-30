@@ -557,7 +557,7 @@ class ApplicationCommand:
 
     @staticmethod
     def _sorted_by_type(commands):
-        sorted_dict = {'chat_input': [], 'user': [], 'message': [], 'primary_entry_point': None}
+        sorted_dict = {'chat_input': [], 'user': [], 'message': [], 'primary_entry_point': []}
         for cmd in commands:
             if cmd['type'] == 1:
                 predicate = 'chat_input'
@@ -567,8 +567,6 @@ class ApplicationCommand:
                 predicate = 'message'
             elif cmd['type'] == 4:
                 predicate = 'primary_entry_point'
-                sorted_dict[predicate] = cmd
-                continue
             else:  # Should not be the case
                 continue
             sorted_dict[predicate].append(cmd)
