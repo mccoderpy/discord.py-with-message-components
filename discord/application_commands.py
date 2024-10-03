@@ -223,7 +223,10 @@ class Localizations:
     @classmethod
     def from_dict(cls, data: Dict[str, str]) -> Localizations:
         data = data or {}
-        return cls(**{try_enum(Locale, key).name: value for key, value in data.items()})
+        for key, value in data.copy().items():
+                k: Union[Locale | str] = try_enum(Locale, key)
+                data[k.name if isinstance(k, Locale) else k] = value
+        return cls(**data)
 
     def update(self, __m: Localizations) -> None:
         """Similar to :meth:`dict.update`"""
