@@ -295,9 +295,10 @@ class InteractionType(Enum):
 
 
 class ApplicationCommandType(Enum):
-    chat_input = 1
-    user       = 2
-    message    = 3
+    chat_input          = 1
+    user                = 2
+    message             = 3
+    primary_entry_point = 4
 
     def __str__(self):
         return getattr(self, 'name')
