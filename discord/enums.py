@@ -657,6 +657,8 @@ class Locale(Enum):
     vi = 'vi'
     hebrew = 'he'
     he = 'he'
+    arabic = 'ar'
+    ar = 'ar'
 
 
 class AutoArchiveDuration(Enum):
