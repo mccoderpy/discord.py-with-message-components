@@ -221,7 +221,9 @@ class Localizations:
         return self.__languages_dict__ if self.__languages_dict__ else None
 
     @classmethod
-    def from_dict(cls, data: Dict[str, str]) -> Localizations:
+    def from_dict(cls, data: Optional[Dict[str, str]]) -> Localizations:
+        if not data:
+            return cls()
         _data = {}
         for key, value in data.items():
             k: Union[Locale | str] = try_enum(Locale, key)
@@ -560,7 +562,7 @@ class ApplicationCommand:
 
     @staticmethod
     def _sorted_by_type(commands):
-        sorted_dict = {'chat_input': [], 'user': [], 'message': [], 'primary_entry_point': []}
+        sorted_dict = {'chat_input': [], 'user': [], 'message': []}
         for cmd in commands:
             if cmd['type'] == 1:
                 predicate = 'chat_input'
@@ -570,6 +572,7 @@ class ApplicationCommand:
                 predicate = 'message'
             elif cmd['type'] == 4:
                 predicate = 'primary_entry_point'
+                sorted_dict[predicate] = [cmd]
             else:  # Should not be the case
                 continue
             sorted_dict[predicate].append(cmd)
