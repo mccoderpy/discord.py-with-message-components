@@ -590,6 +590,8 @@ class VoiceActivityApplication(Enum):
 
 
 class Locale(Enum):
+    indonesian = 'id'
+    id = 'id'
     english_US = 'en-US'
     en_US = 'en-US'
     english_GB = 'en-GB'
@@ -640,6 +642,9 @@ class Locale(Enum):
     ru = 'ru'
     spanish_spain = 'es-ES'
     es_ES = 'es-ES'
+    spanish_latin_america = 'es-419'
+    es_419 = 'es-419'
+    latam = 'es-419'
     swedish = 'sv-SE'
     sv_SE = 'sv-SE'
     thai = 'th'

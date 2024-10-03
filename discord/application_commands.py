@@ -120,7 +120,7 @@ __all__ = (
     'generate_options'
 )
 
-api_docs = 'https://discord.com/developers/docs'
+api_docs = 'https://discord.com/developers/docs/'
 CHAT_COMMAND_NAME_REGEX = re.compile(r'^[-_\w0-9\u0901-\u097D\u0E00-\u0E7F]{1,32}$', flags=re.RegexFlag.UNICODE)
 
 # TODO: Add a (optional) feature for auto generated localizations by a translator
