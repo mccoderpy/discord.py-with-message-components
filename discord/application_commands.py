@@ -184,7 +184,7 @@ class Localizations:
                 self.__languages_dict__[Locale[locale].value] = localized_text
 
     def __repr__(self) -> str:
-        return '<Localizations: %s>' % (", ".join([Locale.try_value(locale) for locale in self.__languages_dict__]
+        return '<Localizations: %s>' % (", ".join([Locale.try_value(locale).name for locale in self.__languages_dict__]
                                                   ) if self.__languages_dict__ else 'None')
 
     def __getitem__(self, item) -> Optional[str]:
@@ -222,11 +222,11 @@ class Localizations:
 
     @classmethod
     def from_dict(cls, data: Dict[str, str]) -> Localizations:
-        data = data or {}
-        for key, value in data.copy().items():
-                k: Union[Locale | str] = try_enum(Locale, key)
-                data[k.name if isinstance(k, Locale) else k] = value
-        return cls(**data)
+        _data = {}
+        for key, value in data.items():
+            k: Union[Locale | str] = try_enum(Locale, key)
+            _data[k.name if isinstance(k, Locale) else k] = value
+        return cls(**_data)
 
     def update(self, __m: Localizations) -> None:
         """Similar to :meth:`dict.update`"""
