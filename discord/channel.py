@@ -4013,7 +4013,7 @@ class ForumChannel(abc.GuildChannel, Hashable):
 
 class PartialMessageable(abc.Messageable, Hashable):
     """Represents a partial messageable to aid with working messageable channels when
-    only a channel ID are present.
+    only a channel ID is present.
 
     The only way to construct this class is through :meth:`Client.get_partial_messageable`.
 
@@ -4039,7 +4039,16 @@ class PartialMessageable(abc.Messageable, Hashable):
         The guild ID associated with this partial messageable, if given.
     partial_data: Dict[:class:`str`, Any]
         A dictionary of partial (raw) api data that might be available for this partial messageable.
+
+        .. seealso::
+
+            See discord api docs :ddocs:`channel object <resources/channel#channel-object>` for more information.
     """
+
+    @property
+    def is_partial(self) -> bool:
+        """:class:`bool`: Returns ``True`` for this class."""
+        return True
 
     def __init__(
             self,
@@ -4089,6 +4098,9 @@ class PartialMessageable(abc.Messageable, Hashable):
         This function is there for compatibility with other channel types.
         Since partial messageables cannot reasonably have the concept of
         permissions, this will always return :meth:`Permissions.none`.
+
+        To check permissions including overwrites, fetch the channel and use :func:`~discord.Member.permissions_in`.
+        However, the raw `overwrites` might be available in :attr:`partial_data`.
 
         Parameters
         -----------

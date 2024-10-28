@@ -1136,6 +1136,13 @@ class Messageable:
     
     __slots__ = ()
 
+    @property
+    def is_partial(self) -> bool:
+        """:class:`bool`: Whether this channel is considered as a partial one.
+        Default to ``False`` for all subclasses of :class:`~discord.abc.Messageable` except :class:`~discord.PartialMessageable`.
+        """
+        return False
+
     @abc.abstractmethod
     async def _get_channel(self):
         raise NotImplementedError
