@@ -271,6 +271,23 @@ RoleTags
 .. autoclass:: RoleTags()
     :members:
 
+
+PartialMessageable
+~~~~~~~~~~~~~~~~~~~
+
+.. attributetable:: PartialMessageable
+
+.. autoclass:: PartialMessageable()
+    :members:
+    :inherited-members:
+    :exclude-members: history, typing
+
+        .. automethod:: history
+            :async-for:
+
+        .. automethod:: typing
+            :async-with:
+
 TextChannel
 ~~~~~~~~~~~~
 

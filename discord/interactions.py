@@ -1882,13 +1882,18 @@ class ResolvedData:
         _channels = getattr(self, '_channels', {})
         for _id, c in value.items():
             _id = int(_id)
-            if self._guild:
+            if self._guild and isinstance(self._guild, Guild):
                 channel = self._guild.get_channel(_id)
             else:
                 channel = self._state.get_channel(_id)
             if not channel:
-                factory, _ch_type_ = _channel_factory(c['type'])
-                channel = factory(guild=self._guild, data=c, state=self._state)
+                channel = PartialMessageable(
+                    state=self._state,
+                    id=_id,
+                    type=try_enum(ChannelType, c['type']),
+                    guild_id=self._guild.id if self._guild else None,
+                    partial_data=c
+                )
             _channels[_id] = channel
 
     @property

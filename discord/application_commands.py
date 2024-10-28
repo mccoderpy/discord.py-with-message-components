@@ -1218,7 +1218,7 @@ class SubCommand(SlashCommandOption):
 
     def autocomplete_callback(self, coro: Callable[[AutocompleteInteraction, ...], Coroutine]):
         """
-       A decorator that sets a |coroutine_link|_ function as the function that will be called
+        A decorator that sets a |coroutine_link|_ function as the function that will be called
         when discord sends an autocomplete interaction for this sub-command.
 
         Parameters
