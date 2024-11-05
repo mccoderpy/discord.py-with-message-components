@@ -1385,6 +1385,8 @@ class SlashCommand(ApplicationCommand):
             description_localizations: Optional[Localizations] = Localizations(),
             default_member_permissions: Optional[Union[Permissions, int]] = None,
             allow_dm: Optional[bool] = True,
+            integration_types: Optional[Set[AppIntegrationType]] = None,
+            contexts: Set[InteractionContextType] = set(),
             is_nsfw: bool = False,
             options: List[SlashCommandOption] = [],
             connector: Dict[str, str] = {},
@@ -1399,6 +1401,8 @@ class SlashCommand(ApplicationCommand):
             description_localizations=description_localizations,
             default_member_permissions=default_member_permissions,
             allow_dm=allow_dm,
+            integration_types=integration_types,
+            contexts=contexts,
             is_nsfw=is_nsfw,
             options=options,
             connector=connector,
@@ -1563,7 +1567,13 @@ class SlashCommand(ApplicationCommand):
         self.description = data.pop('description', 'No Description')
         self.description_localizations = Localizations.from_dict(data.get('description_localizations', {}))
         self.default_member_permissions = Permissions(int(dmp)) if dmp else None
-        self.allow_dm = data.pop('dm_permission', True)
+        self.integration_types: Optional[Set[AppIntegrationType]] = {
+            try_enum(AppIntegrationType, it) for it in i_types
+        } if (i_types := data.get('integration_types')) else None
+        self.contexts: Set[InteractionContextType] = {
+            try_enum(InteractionContextType, ct) for ct in (data.get('contexts', []) or [])
+        }
+        self.allow_dm = data.pop('dm_permission', (InteractionContextType.bot_dm in self.contexts))
         self.is_nsfw = data.get('nsfw', False)
         self._guild_id = int(data.get('guild_id', 0))
         self._state_ = state
@@ -1857,23 +1867,35 @@ class UserCommand(ApplicationCommand):
             name_localizations: Optional[Localizations] = None,
             default_member_permissions: Optional[Union[Permissions, int]] = None,
             allow_dm: Optional[bool] = True,
+            integration_types: Optional[Set[AppIntegrationType]] = None,
+            contexts: Set[InteractionContextType] = set(),
             **kwargs
             ):
         if 32 < len(name) < 1:
             raise ValueError('The name of the User-Command has to be 1-32 characters long, got %s.' % len(name))
         super().__init__(2, name=name, name_localizations=name_localizations,
-                         default_member_permissions=default_member_permissions, allow_dm=allow_dm, **kwargs
+                         default_member_permissions=default_member_permissions, allow_dm=allow_dm, integration_types=integration_types,
+                         contexts=contexts, **kwargs
                          )
 
     @classmethod
     def from_dict(cls, state, data):
         dmp = data.pop('default_member_permissions', None)
         data.pop('type')
+        integration_types: Optional[Set[AppIntegrationType]] = {
+            try_enum(AppIntegrationType, it) for it in i_types
+        } if (i_types := data.get('integration_types')) else None
+        contexts: Set[InteractionContextType] = {
+            try_enum(InteractionContextType, ct) for ct in (data.get('contexts', []) or [])
+        }
+        allow_dm = data.pop('dm_permission', (InteractionContextType.bot_dm in contexts))
         return cls(
             name=data.pop('name'),
             name_localizations=Localizations.from_dict(data.get('name_localizations', {})),
             default_member_permissions=Permissions(int(dmp)) if dmp else None,
-            allow_dm=data.get('dm_permission', True),
+            allow_dm=allow_dm,
+            integration_types=integration_types,
+            contexts=contexts,
             state=state,
             **data
         )._fill_data(data)
@@ -1908,23 +1930,35 @@ class MessageCommand(ApplicationCommand):
             name_localizations: Optional[Localizations] = Localizations(),
             default_member_permissions: Optional[Union[Permissions, int]] = None,
             allow_dm: Optional[bool] = True,
+            integration_types: Optional[Set[AppIntegrationType]] = None,
+            contexts: Set[InteractionContextType] = set(),
             **kwargs
             ):
         if 32 < len(name) < 1:
             raise ValueError('The name of the Message-Command has to be 1-32 characters long, got %s.' % len(name))
         super().__init__(3, name=name, name_localizations=name_localizations,
-                         default_member_permissions=default_member_permissions, allow_dm=allow_dm, **kwargs
+                         default_member_permissions=default_member_permissions, allow_dm=allow_dm, integration_types=inntegration_types,
+                         contexts=contexts, **kwargs
                          )
 
     @classmethod
     def from_dict(cls, state, data):
         dmp = data.pop('default_member_permissions', None)
         data.pop('type')
+        integration_types: Optional[Set[AppIntegrationType]] = {
+            try_enum(AppIntegrationType, it) for it in i_types
+        } if (i_types := data.get('integration_types')) else None
+        contexts: Set[InteractionContextType] = {
+            try_enum(InteractionContextType, ct) for ct in (data.get('contexts', []) or [])
+        }
+        allow_dm = data.pop('dm_permission', (InteractionContextType.bot_dm in contexts))
         return cls(
             name=data.pop('name'),
             name_localizations=Localizations.from_dict(data.pop('name_localizations', {})),
             default_member_permissions=Permissions(int(dmp)) if dmp else None,
-            allow_dm=data.get('dm_permission', True),
+            allow_dm=allow_dm,
+            integration_types=integration_types,
+            contexts=contexts,
             state=state,
             **data
         )._fill_data(data)
