@@ -111,7 +111,7 @@ _default = _DefaultRepr()
 
 
 class BotBase(GroupMixin):
-    def __init__(self, command_prefix, help_command=_default, description=None, **options):
+    def __init__(self, command_prefix=None, help_command=_default, description=None, **options):
         super().__init__(**options)
         self.command_prefix = command_prefix
         self.extra_events: Dict[str, List[Callable[..., ...]]] = {}
@@ -1135,6 +1135,9 @@ class BotBase(GroupMixin):
             listening for.
         """
         prefix = ret = self.command_prefix
+        if prefix is None:
+            return None
+        
         if callable(prefix):
             ret = await discord.utils.maybe_coroutine(prefix, self, message)
 
@@ -1194,6 +1197,9 @@ class BotBase(GroupMixin):
             return ctx
 
         prefix = await self.get_prefix(message)
+        if prefix is None:
+            return ctx
+        
         invoked_prefix = prefix
 
         if isinstance(prefix, str):
@@ -1287,6 +1293,8 @@ class BotBase(GroupMixin):
             return
 
         ctx = await self.get_context(message)
+        if ctx.command is None:
+            return
         await self.invoke(ctx)
 
     async def on_message(self, message):
