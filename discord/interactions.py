@@ -903,6 +903,7 @@ class BaseInteraction:
                 content=content,
                 flags=flags,
                 embed=embed,
+                embeds=embeds,
                 attachments=attachments,
                 components=components,
                 allowed_mentions=allowed_mentions,
